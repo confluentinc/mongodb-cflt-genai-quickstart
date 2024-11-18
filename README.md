@@ -96,7 +96,7 @@ environment use env-d1zzw7
 # embedding connection
 confluent flink connection create bedrock-titan-embed-connection \
 --cloud AWS \
---region us-east-2 \
+--region us-east-1 \
 --type bedrock \
 --endpoint https://bedrock-runtime.us-east-1.amazonaws.com/model/amazon.titan-embed-text-v2:0/invoke \
 --aws-access-key $AWS_ACCESS_KEY_ID \
@@ -105,7 +105,7 @@ confluent flink connection create bedrock-titan-embed-connection \
 # text generation
 confluent flink connection create bedrock-claude-3-haiku-connection \
 --cloud AWS \
---region us-east-2 \
+--region us-east-1 \
 --type bedrock \
 --endpoint https://bedrock-runtime.us-east-1.amazonaws.com/model/anthropic.claude-3-haiku-20240307-v1:0/invoke \
 --aws-access-key $AWS_ACCESS_KEY_ID \

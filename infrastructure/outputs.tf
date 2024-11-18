@@ -26,3 +26,11 @@ output "resource-ids" {
   description = "The IDs of the resources created by this module. This output is sensitive and will not be displayed in the plan."
   sensitive   = true
 }
+
+output "bucket_name" {
+  value = aws_s3_bucket.frontend.bucket
+}
+
+output "cloudfront_domain-name" {
+  value = aws_cloudfront_distribution.frontend.domain_name
+}

@@ -37,6 +37,7 @@ terraform output resource-ids
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.75.0 |
 | <a name="provider_confluent"></a> [confluent](#provider\_confluent) | 2.5.0 |
 | <a name="provider_external"></a> [external](#provider\_external) | 2.3.4 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.3 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
 
 ## Modules
@@ -52,6 +53,14 @@ terraform output resource-ids
 
 | Name | Type |
 |------|------|
+| [aws_cloudfront_distribution.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
+| [aws_cloudfront_origin_access_control.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_control) | resource |
+| [aws_s3_bucket.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [aws_s3_bucket_acl.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
+| [aws_s3_bucket_ownership_controls.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
+| [aws_s3_bucket_policy.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
+| [aws_s3_bucket_public_access_block.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
+| [aws_s3_bucket_website_configuration.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration) | resource |
 | [aws_secretsmanager_secret.confluent_cloud_genai_demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.confluent_cloud_genai_demo_version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [confluent_api_key.app-manager-flink-api-key](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/resources/api_key) | resource |
@@ -74,7 +83,9 @@ terraform output resource-ids
 | [confluent_service_account.app-manager](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/resources/service_account) | resource |
 | [confluent_service_account.clients](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/resources/service_account) | resource |
 | [confluent_service_account.statements-runner](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/resources/service_account) | resource |
+| [null_resource.frontend_build_and_deploy](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_id.env_display_id](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [aws_iam_policy_document.frontend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [confluent_environment.staging](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/data-sources/environment) | data source |
 | [confluent_flink_region.main](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/data-sources/flink_region) | data source |
 | [confluent_organization.main](https://registry.terraform.io/providers/confluentinc/confluent/2.5.0/docs/data-sources/organization) | data source |
@@ -95,5 +106,7 @@ terraform output resource-ids
 
 | Name | Description |
 |------|-------------|
+| <a name="output_bucket_name"></a> [bucket\_name](#output\_bucket\_name) | n/a |
+| <a name="output_cloudfront_domain-name"></a> [cloudfront\_domain-name](#output\_cloudfront\_domain-name) | n/a |
 | <a name="output_resource-ids"></a> [resource-ids](#output\_resource-ids) | The IDs of the resources created by this module. This output is sensitive and will not be displayed in the plan. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
