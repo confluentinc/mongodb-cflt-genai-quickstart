@@ -1,0 +1,16 @@
+---
+import Chat from "../components/Chat";
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body class="flex flex-col items-center justify-center w-screen min-h-screen bg-gray-700 text-white p-10">
+		<Chat client:only="react" />
+	</body>
+</html>
