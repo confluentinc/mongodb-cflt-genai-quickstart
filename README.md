@@ -8,27 +8,20 @@ and provides the chatbot with the necessary information to respond to user queri
 ## 🚀 Project Structure
 
 ```text
-.
-├── backend # Spring Boot Application
-│ └── src
-│     └── main
-│         ├── java
-│         │ └── io
-│         │     └── confluent
-│         │         └── genai_demo
-│         │             ├── config
-│         │             ├── controller
-│         │             ├── model
-│         │             └── service
-│         └── resources
-│             ├── static
-│             └── templates
-├── frontend # Astro / React Application
-│ ├── public
-│ └── src
-│     ├── components
-│     └── pages
-└── infrastructure # Terraform 
+. # root of the project
+├── frontend # Frontend project for the chatbot. This is what will be deployed to s3 and exposed via cloudfront
+└── infrastructure # terraform to deploy the infrastructure
+    ├── modules
+    │     ├── backend # websocket backend & lambdas for the chatbot
+    │     │     └── functions # lambda functions
+    │     ├── confluent-cloud-cluster # confluent cloud infra. i.e. kafka, flink, schema registry, etc.
+    │     └── frontend # s3 bucket and cloudfront distribution
+    │         └── scripts # scripts to assist with building and deploying the frontend
+    ├── scripts # scripts to assist with deploying the infrastructure
+    └── statements # sql statements to register against a flink cluster
+        ├── create-models
+        ├── create-tables
+        └── insert
 ```
 
 ## Requirements
@@ -36,7 +29,6 @@ and provides the chatbot with the necessary information to respond to user queri
 - [ ] [Confluent Cloud API Keys](https://www.confluent.io/blog/confluent-terraform-provider-intro/#api-key)
 - [ ] [Terraform](https://github.com/tfutils/tfenv) (1.9.2 or higher)
 - [ ] [Node.js](https://github.com/nvm-sh/nvm) (v20.15 or higher)
-- [ ] [Java](https://www.jenv.be/) (v17 or higher)
 
 ## Run the Demo
 
@@ -50,42 +42,18 @@ terraform apply --var-file terraform.tfvars # populate your tfvars file with you
 terraform output resource-ids
 ```
 
-### 2. Start the backend
-
-This backend exposes a rest api on http://localhost:8080/sse/events
-
-```shell title=".env
-#.env file
-# kafka
-BOOTSTRAP_SERVERS=
-KAFKA_KEY_ID=
-KAFKA_KEY_SECRET=
-# confluent cloud schema registry
-SCHEMA_REGISTRY_URL=
-SCHEMA_REGISTRY_KEY_ID=
-SCHEMA_REGISTRY_KEY_SECRET=
-# aws creds for bedrock models
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-```
-
-```sh
-cd backend
-export $(grep -v '^#' .env | xargs) && ./mvnw spring-boot:run
-```
-
-### 3. Start the frontend
+### 2. Start the frontend
 
 ```sh
 cd frontend
 npm run dev # Starts local dev server at `localhost:4321`
 ```
 
-### 4. Interact with the chatbot
+### 3. Interact with the chatbot
 
 Open your browser and navigate to `http://localhost:4321/` to interact with the chatbot.
 
-### 5. Create flink external sql connections
+### 4. Create flink external sql connections
 
 ```sql
 confluent
@@ -112,14 +80,14 @@ confluent flink connection create bedrock-claude-3-haiku-connection \
 --aws-secret-key $AWS_SECRET_ACCESS_KEY         
 ```
 
-### 6. Connect to the flink sql shell
+### 5. Connect to the flink sql shell
 
 ```shell
 # get the flink compute pool id and environment id from the list command
-confluent flink compute-pool list --region us-east-2            
+confluent flink compute-pool list --region us-east-1            
   Current |     ID      |             Name              | Environment | Current CFU | Max CFU | Cloud |  Region   |   Status     
 ----------+-------------+-------------------------------+-------------+-------------+---------+-------+-----------+--------------
-  *       | lfcp-7m5yr2 | genai-demo-flink-compute-pool | env-8gq9rr  |           0 |      30 | AWS   | us-east-2 | PROVISIONED  
+  *       | lfcp-7m5yr2 | genai-demo-flink-compute-pool | env-8gq9rr  |           0 |      30 | AWS   | us-east-1 | PROVISIONED  
 ```
 
 ```shell
@@ -127,7 +95,7 @@ confluent flink compute-pool list --region us-east-2
 confluent flink shell --environment env-8gq9rr --compute-pool lfcp-7m5yr2
 ```
 
-### 7. Product Indexing
+### 6. Product Indexing
 
 #### a. Create AI Models
 
@@ -431,7 +399,7 @@ select product_id, embeddings, summary, product_name, product_type, coverage_typ
 LATERAL TABLE(ML_PREDICT('bedrock_titan_embed', summary));
 ```
 
-### 8. Chatbot Assistant
+### 7. Chatbot Assistant
 
 #### a. Create Ai Chat Assistant Model
 
@@ -495,7 +463,7 @@ VALUES ('003',
         CURRENT_TIMESTAMP);
 ```
 
-### 9. Sending Data with Embeddings to MongoDB Atlas
+### 8. Sending Data with Embeddings to MongoDB Atlas
 
 #### a. Atlas Configuration
 

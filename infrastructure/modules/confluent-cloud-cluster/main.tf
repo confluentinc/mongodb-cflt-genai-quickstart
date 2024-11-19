@@ -1,0 +1,338 @@
+data "confluent_organization" "main" {}
+
+# ------------------------------------------------------
+# ENVIRONMENT
+# ------------------------------------------------------
+
+resource "confluent_environment" "staging" {
+  count        = var.confluent_cloud_environment.enable_creation ? 1 : 0
+  display_name = var.confluent_cloud_environment.name
+
+  stream_governance {
+    package = "ESSENTIALS"
+  }
+
+  lifecycle {
+    # flip this to true to prevent the environment from being destroyed
+    prevent_destroy = false
+  }
+}
+
+data "confluent_environment" "staging" {
+  display_name = var.confluent_cloud_environment.name
+  depends_on = [
+    confluent_environment.staging
+  ]
+}
+
+# ------------------------------------------------------
+# KAFKA
+# ------------------------------------------------------
+
+// In Confluent Cloud, an environment is mapped to a Flink catalog, and a Kafka cluster is mapped to a Flink database.
+resource "confluent_kafka_cluster" "standard" {
+  display_name = "genai-demo-${var.env_display_id_postfix}"
+  availability = "SINGLE_ZONE"
+  cloud        = var.confluent_cloud_service_provider
+  region       = var.confluent_cloud_region
+  standard {}
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+}
+
+# ------------------------------------------------------
+# Schema Registry
+# ------------------------------------------------------
+data "confluent_schema_registry_cluster" "essentials" {
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+
+  depends_on = [
+    confluent_kafka_cluster.standard
+  ]
+}
+
+# ------------------------------------------------------
+# FLINK
+# ------------------------------------------------------
+data "confluent_flink_region" "main" {
+  cloud  = var.confluent_cloud_service_provider
+  region = var.confluent_cloud_region
+}
+
+# https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html#step-1-create-a-af-compute-pool
+resource "confluent_flink_compute_pool" "main" {
+  display_name = "genai-demo-flink-compute-pool-${var.env_display_id_postfix}"
+  cloud        = var.confluent_cloud_service_provider
+  region       = var.confluent_cloud_region
+  max_cfu      = 30
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+  depends_on = [
+    confluent_role_binding.statements-runner-environment-admin,
+    confluent_role_binding.app-manager-assigner,
+    confluent_role_binding.app-manager-flink-developer,
+    confluent_api_key.app-manager-flink-api-key,
+  ]
+}
+
+resource "confluent_flink_statement" "create-tables" {
+  for_each = var.create_table_sql_files
+  organization {
+    id = data.confluent_organization.main.id
+  }
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+  compute_pool {
+    id = confluent_flink_compute_pool.main.id
+  }
+  principal {
+    id = confluent_service_account.statements-runner.id
+  }
+
+  properties = {
+    "sql.current-catalog"  = data.confluent_environment.staging.display_name
+    "sql.current-database" = confluent_kafka_cluster.standard.display_name
+  }
+  rest_endpoint = data.confluent_flink_region.main.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-flink-api-key.id
+    secret = confluent_api_key.app-manager-flink-api-key.secret
+  }
+  statement = file(abspath(each.value))
+}
+
+resource "confluent_flink_statement" "create-models" {
+  for_each = var.create_model_sql_files
+  organization {
+    id = data.confluent_organization.main.id
+  }
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+  compute_pool {
+    id = confluent_flink_compute_pool.main.id
+  }
+  principal {
+    id = confluent_service_account.statements-runner.id
+  }
+
+  properties = {
+    "sql.current-catalog"  = data.confluent_environment.staging.display_name
+    "sql.current-database" = confluent_kafka_cluster.standard.display_name
+  }
+  rest_endpoint = data.confluent_flink_region.main.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-flink-api-key.id
+    secret = confluent_api_key.app-manager-flink-api-key.secret
+  }
+  statement = file(abspath(each.value))
+}
+
+resource "confluent_flink_statement" "insert-data" {
+  for_each = var.insert_data_sql_files
+  organization {
+    id = data.confluent_organization.main.id
+  }
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+  compute_pool {
+    id = confluent_flink_compute_pool.main.id
+  }
+  principal {
+    id = confluent_service_account.statements-runner.id
+  }
+
+  properties = {
+    "sql.current-catalog"  = data.confluent_environment.staging.display_name
+    "sql.current-database" = confluent_kafka_cluster.standard.display_name
+  }
+  rest_endpoint = data.confluent_flink_region.main.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-flink-api-key.id
+    secret = confluent_api_key.app-manager-flink-api-key.secret
+  }
+  statement = file(abspath(each.value))
+
+  depends_on = [
+    confluent_flink_statement.create-tables
+  ]
+}
+
+# ------------------------------------------------------
+# SERVICE ACCOUNTS
+# ------------------------------------------------------
+
+// Service account for kafka clients that will be used to produce and consume messages
+resource "confluent_service_account" "clients" {
+  display_name = "client-sa-${var.env_display_id_postfix}"
+  description  = "Service account for clients"
+}
+
+// Service account to perform a task within Confluent Cloud, such as executing a Flink statement
+resource "confluent_service_account" "statements-runner" {
+  display_name = "statements-runner-sa-${var.env_display_id_postfix}"
+  description  = "Service account for running Flink Statements in the Kafka cluster"
+}
+
+// Service account that owns Flink API Key
+resource "confluent_service_account" "app-manager" {
+  display_name = "app-manager-sa-${var.env_display_id_postfix}"
+  description  = "Service account that has got full access to Flink resources in an environment"
+}
+
+# ------------------------------------------------------
+# ROLE BINDINGS
+# ------------------------------------------------------
+resource "confluent_role_binding" "statements-runner-environment-admin" {
+  principal   = "User:${confluent_service_account.statements-runner.id}"
+  role_name   = "EnvironmentAdmin"
+  crn_pattern = data.confluent_environment.staging.resource_name
+}
+
+// https://docs.confluent.io/cloud/current/access-management/access-control/rbac/predefined-rbac-roles.html#flinkdeveloper
+resource "confluent_role_binding" "app-manager-flink-developer" {
+  principal   = "User:${confluent_service_account.app-manager.id}"
+  role_name   = "FlinkDeveloper"
+  crn_pattern = data.confluent_environment.staging.resource_name
+}
+
+// https://docs.confluent.io/cloud/current/access-management/access-control/rbac/predefined-rbac-roles.html#assigner
+// https://docs.confluent.io/cloud/current/flink/operate-and-deploy/flink-rbac.html#submit-long-running-statements
+resource "confluent_role_binding" "app-manager-assigner" {
+  principal   = "User:${confluent_service_account.app-manager.id}"
+  role_name   = "Assigner"
+  crn_pattern = "${data.confluent_organization.main.resource_name}/service-account=${confluent_service_account.statements-runner.id}"
+}
+
+resource "confluent_role_binding" "client-kafka-cluster-admin" {
+  principal   = "User:${confluent_service_account.clients.id}"
+  role_name   = "CloudClusterAdmin"
+  crn_pattern = confluent_kafka_cluster.standard.rbac_crn
+}
+
+resource "confluent_role_binding" "client-schema-registry-developer-write" {
+  principal   = "User:${confluent_service_account.clients.id}"
+  crn_pattern = "${data.confluent_schema_registry_cluster.essentials.resource_name}/subject=*"
+  role_name   = "DeveloperWrite"
+}
+
+# ------------------------------------------------------
+# API KEYS
+# ------------------------------------------------------
+resource "confluent_api_key" "app-manager-flink-api-key" {
+  display_name = "app-manager-flink-api-key"
+  description  = "Flink API Key that is owned by 'app-manager' service account"
+  owner {
+    id          = confluent_service_account.app-manager.id
+    api_version = confluent_service_account.app-manager.api_version
+    kind        = confluent_service_account.app-manager.kind
+  }
+  managed_resource {
+    id          = data.confluent_flink_region.main.id
+    api_version = data.confluent_flink_region.main.api_version
+    kind        = data.confluent_flink_region.main.kind
+    environment {
+      id = data.confluent_environment.staging.id
+    }
+  }
+}
+
+resource "confluent_api_key" "client_key" {
+  display_name = "clients-api-key-${var.env_display_id_postfix}"
+  description  = "client API Key"
+  owner {
+    id          = confluent_service_account.clients.id
+    api_version = confluent_service_account.clients.api_version
+    kind        = confluent_service_account.clients.kind
+  }
+  managed_resource {
+    id          = confluent_kafka_cluster.standard.id
+    api_version = confluent_kafka_cluster.standard.api_version
+    kind        = confluent_kafka_cluster.standard.kind
+    environment {
+      id = data.confluent_environment.staging.id
+    }
+  }
+}
+
+resource "confluent_api_key" "clients-schema-registry-api-key" {
+  display_name = "clients-sr-api-key-${var.env_display_id_postfix}"
+  description  = "Schema Registry API Key"
+  owner {
+    id          = confluent_service_account.clients.id
+    api_version = confluent_service_account.clients.api_version
+    kind        = confluent_service_account.clients.kind
+  }
+  managed_resource {
+    id          = data.confluent_schema_registry_cluster.essentials.id
+    api_version = data.confluent_schema_registry_cluster.essentials.api_version
+    kind        = data.confluent_schema_registry_cluster.essentials.kind
+    environment {
+      id = data.confluent_environment.staging.id
+    }
+  }
+}
+
+# ------------------------------------------------------
+# Client Acls
+# ------------------------------------------------------
+
+resource "confluent_kafka_acl" "app-client-describe-on-cluster" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "CLUSTER"
+  resource_name = "kafka-cluster"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.clients.id}"
+  host          = "*"
+  operation     = "DESCRIBE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.client_key.id
+    secret = confluent_api_key.client_key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "app-client-read-on-target-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "*"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.clients.id}"
+  host          = "*"
+  operation     = "READ"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.client_key.id
+    secret = confluent_api_key.client_key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "app-client-write-to-data-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "*"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.clients.id}"
+  host          = "*"
+  operation     = "WRITE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.client_key.id
+    secret = confluent_api_key.client_key.secret
+  }
+}
