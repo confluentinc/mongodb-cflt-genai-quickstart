@@ -1,9 +1,14 @@
-# GenAI Chatbot Demos
+# GenAI Chatbot Quick Start
 
-This demo showcases how to use confluent cloud with flink to build a chatbot powereed by GenAI. Confluent Cloud enables
-real-time data freshness and scalability for the chatbot. With Apache Kafka as its foundation, Confluent Cloud
-orchestrates the flow of information between various components of the chatbot. Flink processes the data in real-time
-and provides the chatbot with the necessary information to respond to user queries.
+Welcome to the **Small Business Loan Chatbot Quick Start**! This repository provides everything you need to deploy a fully functional chatbot designed to assist small businesses in loan inquiries. The chatbot is powered by cutting-edge technologies to deliver accurate and efficient responses.
+
+This quick start leverages a modern tech stack to ensure high-quality, real-time interactions:
+
+- **Confluent Cloud** enables real-time data streaming, ensuring the chatbot has access to fresh, up-to-date information. This enhances the accuracy and relevance of responses, significantly improving the quality of interactions with the LLM.
+- **MongoDB Atlas** serves as the vector database, enabling fast and efficient retrieval of context and relevant data.
+- **AWS Bedrock** powers the chatbot with Anthropic Claude, a state-of-the-art large language model (LLM) for natural and conversational interactions.
+
+The entire solution can be deployed effortlessly using a single command-line operation, making it accessible to developers and non-developers alike. By combining real-time data streaming with advanced AI capabilities, this chatbot ensures the best possible user experience. Start building your chatbot today with minimal effort and maximum impact!
 
 ## 🚀 Project Structure
 
@@ -31,7 +36,7 @@ and provides the chatbot with the necessary information to respond to user queri
 - [ ] [AWS API Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html)
 - [ ] [Docker](https://docs.docker.com/get-docker/)
 
-## Run the Demo
+## Run the quick start
 
 ### 1. Bring up the infrastructure
 
