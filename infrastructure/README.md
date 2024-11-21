@@ -74,8 +74,11 @@ terraform output resource-ids
 | Name | Description |
 |------|-------------|
 | <a name="output_bootstrap_servers"></a> [bootstrap\_servers](#output\_bootstrap\_servers) | Bootstrap servers for Kafka clients to connect to the kafka cluster. Removes the SASL\_SSL:// prefix for ease of use. |
-| <a name="output_clients-kafka-api-key"></a> [clients-kafka-api-key](#output\_clients-kafka-api-key) | API Key for Kafka client |
-| <a name="output_clients-schema-registry-api-key"></a> [clients-schema-registry-api-key](#output\_clients-schema-registry-api-key) | API Key for Schema Registry client |
+| <a name="output_clients_kafka_api_key"></a> [clients\_kafka\_api\_key](#output\_clients\_kafka\_api\_key) | API Key for Kafka client |
+| <a name="output_clients_schema_registry_api_key"></a> [clients\_schema\_registry\_api\_key](#output\_clients\_schema\_registry\_api\_key) | API Key for Schema Registry client |
+| <a name="output_flink_api_key"></a> [flink\_api\_key](#output\_flink\_api\_key) | API Key for managing flink resources |
+| <a name="output_flink_environment_id"></a> [flink\_environment\_id](#output\_flink\_environment\_id) | Confluent Cloud Flink Environment ID |
+| <a name="output_flink_rest_endpoint"></a> [flink\_rest\_endpoint](#output\_flink\_rest\_endpoint) | Flink REST endpoint |
 | <a name="output_frontend_url"></a> [frontend\_url](#output\_frontend\_url) | n/a |
 | <a name="output_schema_registry_url"></a> [schema\_registry\_url](#output\_schema\_registry\_url) | URL for the Schema Registry |
 | <a name="output_websocket_endpoint"></a> [websocket\_endpoint](#output\_websocket\_endpoint) | n/a |

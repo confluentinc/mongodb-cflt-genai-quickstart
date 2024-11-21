@@ -79,6 +79,13 @@ resource "confluent_flink_compute_pool" "main" {
   ]
 }
 
+data "confluent_flink_compute_pool" "main" {
+  id = confluent_flink_compute_pool.main.id
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+}
+
 resource "confluent_flink_statement" "create-tables" {
   for_each = var.create_table_sql_files
   organization {
@@ -106,6 +113,34 @@ resource "confluent_flink_statement" "create-tables" {
   statement = file(abspath(each.value))
 }
 
+# registers flink sql connections with bedrock. should be replaced when
+# terraform provider supports managing flink sql connections
+resource "null_resource" "create-flink-bedrock-connections" {
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/flink-connection-create.sh"
+    environment = {
+      FLINK_API_KEY       = confluent_api_key.app-manager-flink-api-key.id
+      FLINK_API_SECRET    = confluent_api_key.app-manager-flink-api-key.secret
+      FLINK_ENV_ID        = data.confluent_flink_compute_pool.main.environment[0].id
+      FLINK_ORG_ID        = data.confluent_organization.main.id
+      FLINK_REST_ENDPOINT = data.confluent_flink_region.main.rest_endpoint
+      # the rest should be set by deploy.sh
+    }
+  }
+
+  triggers = {
+    # changes to the flink sql cluster will trigger the bedrock connections to be created
+    flink_sql_cluster_id = data.confluent_flink_compute_pool.main.id
+    # change if the script changes
+    script = filesha256("${path.module}/scripts/flink-connection-create.sh")
+  }
+  depends_on = [
+    confluent_flink_compute_pool.main,
+    confluent_api_key.app-manager-flink-api-key,
+    confluent_role_binding.app-manager-flink-admin
+  ]
+}
+
 resource "confluent_flink_statement" "create-models" {
   for_each = var.create_model_sql_files
   organization {
@@ -131,6 +166,9 @@ resource "confluent_flink_statement" "create-models" {
     secret = confluent_api_key.app-manager-flink-api-key.secret
   }
   statement = file(abspath(each.value))
+  depends_on = [
+    null_resource.create-flink-bedrock-connections
+  ]
 }
 
 resource "confluent_flink_statement" "insert-data" {
@@ -160,7 +198,9 @@ resource "confluent_flink_statement" "insert-data" {
   statement = file(abspath(each.value))
 
   depends_on = [
-    confluent_flink_statement.create-tables
+    confluent_flink_statement.create-tables,
+    confluent_flink_statement.create-models,
+    null_resource.create-flink-bedrock-connections
   ]
 }
 
@@ -199,6 +239,12 @@ resource "confluent_role_binding" "statements-runner-environment-admin" {
 resource "confluent_role_binding" "app-manager-flink-developer" {
   principal   = "User:${confluent_service_account.app-manager.id}"
   role_name   = "FlinkDeveloper"
+  crn_pattern = data.confluent_environment.staging.resource_name
+}
+
+resource "confluent_role_binding" "app-manager-flink-admin" {
+  principal   = "User:${confluent_service_account.app-manager.id}"
+  role_name   = "FlinkAdmin"
   crn_pattern = data.confluent_environment.staging.resource_name
 }
 

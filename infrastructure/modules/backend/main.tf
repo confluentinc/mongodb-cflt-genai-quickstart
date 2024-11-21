@@ -91,12 +91,10 @@ module "websocket_chat_api_lambda_layer" {
   compatible_runtimes      = ["python3.12"]
   runtime                  = "python3.12"
   compatible_architectures = [var.system_architecture]
-  build_in_docker          = true
-  # this is required due to https://www.linkedin.com/pulse/how-create-confluent-python-lambda-layer-braeden-quirante/
   source_path = [
     {
       pip_requirements = "${path.module}/functions/requirements.txt",
-      prefix_in_zip    = "python"
+      prefix_in_zip    = "python",
     }
   ]
 }
@@ -114,7 +112,6 @@ module "websocket_chat_api_lambda" {
   handler       = "websocket_lambda.lambda_handler"
   runtime       = "python3.12"
   architectures = [var.system_architecture]
-  timeout       = 300
 
   environment_variables = {
     SCHEMA_REGISTRY_URL        = var.schema_registry_url
@@ -154,7 +151,8 @@ module "websocket_chat_api_lambda" {
 
 # Required for the Lambda function to connect to the Kafka cluster
 resource "aws_secretsmanager_secret" "confluent_cloud_genai_demo" {
-  name = "confluent/chatbot-api/creds/${var.env_display_id_postfix}"
+  name                    = "confluent/chatbot-api/creds/${var.env_display_id_postfix}"
+  recovery_window_in_days = 0
 }
 
 

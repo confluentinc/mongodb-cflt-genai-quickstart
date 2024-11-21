@@ -1,11 +1,11 @@
-output "clients-schema-registry-api-key" {
-  value       = module.confluent_cloud_cluster.clients-schema-registry-api-key
+output "clients_schema_registry_api_key" {
+  value       = module.confluent_cloud_cluster.clients_schema_registry_api_key
   description = "API Key for Schema Registry client"
   sensitive   = true
 }
 
-output "clients-kafka-api-key" {
-  value       = module.confluent_cloud_cluster.clients-kafka-api-key
+output "clients_kafka_api_key" {
+  value       = module.confluent_cloud_cluster.clients_kafka_api_key
   description = "API Key for Kafka client"
   sensitive   = true
 }
@@ -18,6 +18,22 @@ output "schema_registry_url" {
 output "bootstrap_servers" {
   value       = module.confluent_cloud_cluster.bootstrap_servers
   description = "Bootstrap servers for Kafka clients to connect to the kafka cluster. Removes the SASL_SSL:// prefix for ease of use."
+}
+
+output "flink_api_key" {
+  value       = module.confluent_cloud_cluster.app_manager_flink_api_key
+  description = "API Key for managing flink resources"
+  sensitive   = true
+}
+
+output "flink_rest_endpoint" {
+  value       = module.confluent_cloud_cluster.flink_rest_endpoint
+  description = "Flink REST endpoint"
+}
+
+output "flink_environment_id" {
+  value       = module.confluent_cloud_cluster.flink_environment_id
+  description = "Confluent Cloud Flink Environment ID"
 }
 
 output "frontend_url" {

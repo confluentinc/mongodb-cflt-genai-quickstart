@@ -12,6 +12,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_confluent"></a> [confluent](#provider\_confluent) | ~> 2.5.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
 
@@ -34,6 +35,7 @@ No modules.
 | [confluent_kafka_acl.app-client-write-to-data-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
 | [confluent_kafka_cluster.standard](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_cluster) | resource |
 | [confluent_role_binding.app-manager-assigner](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
+| [confluent_role_binding.app-manager-flink-admin](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
 | [confluent_role_binding.app-manager-flink-developer](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
 | [confluent_role_binding.client-kafka-cluster-admin](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
 | [confluent_role_binding.client-schema-registry-developer-write](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
@@ -41,7 +43,9 @@ No modules.
 | [confluent_service_account.app-manager](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [confluent_service_account.clients](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [confluent_service_account.statements-runner](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
+| [null_resource.create-flink-bedrock-connections](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [confluent_environment.staging](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/environment) | data source |
+| [confluent_flink_compute_pool.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/flink_compute_pool) | data source |
 | [confluent_flink_region.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/flink_region) | data source |
 | [confluent_organization.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/organization) | data source |
 | [confluent_schema_registry_cluster.essentials](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/schema_registry_cluster) | data source |
@@ -62,8 +66,12 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_app_manager_flink_api_key"></a> [app\_manager\_flink\_api\_key](#output\_app\_manager\_flink\_api\_key) | API Key for managing flink resources |
 | <a name="output_bootstrap_servers"></a> [bootstrap\_servers](#output\_bootstrap\_servers) | Bootstrap servers for Kafka clients to connect to the kafka cluster. Removes the SASL\_SSL:// prefix for ease of use. |
-| <a name="output_clients-kafka-api-key"></a> [clients-kafka-api-key](#output\_clients-kafka-api-key) | API Key for Kafka client |
-| <a name="output_clients-schema-registry-api-key"></a> [clients-schema-registry-api-key](#output\_clients-schema-registry-api-key) | API Key for Schema Registry client |
+| <a name="output_clients_kafka_api_key"></a> [clients\_kafka\_api\_key](#output\_clients\_kafka\_api\_key) | API Key for Kafka client |
+| <a name="output_clients_schema_registry_api_key"></a> [clients\_schema\_registry\_api\_key](#output\_clients\_schema\_registry\_api\_key) | API Key for Schema Registry client |
+| <a name="output_flink_environment_id"></a> [flink\_environment\_id](#output\_flink\_environment\_id) | Confluent Cloud Flink Environment ID |
+| <a name="output_flink_rest_endpoint"></a> [flink\_rest\_endpoint](#output\_flink\_rest\_endpoint) | Flink REST endpoint |
+| <a name="output_organization_id"></a> [organization\_id](#output\_organization\_id) | Confluent Cloud Organization ID |
 | <a name="output_schema_registry_url"></a> [schema\_registry\_url](#output\_schema\_registry\_url) | URL for the Schema Registry |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
