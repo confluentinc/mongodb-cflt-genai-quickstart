@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.confluent.pie.search.models.SearchResults;
+import org.confluent.pie.search.models.SearchResultsKey;
 import org.confluent.pie.search.tools.ConfigUtils;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.function.Supplier;
  */
 @Slf4j
 @AllArgsConstructor
-public class KafkaProducerSupplier implements Supplier<Producer<String, SearchResults>> {
+public class KafkaProducerSupplier implements Supplier<Producer<SearchResultsKey, SearchResults>> {
 
     private final KafkaProducerConfiguration configuration;
 
@@ -30,7 +31,7 @@ public class KafkaProducerSupplier implements Supplier<Producer<String, SearchRe
      * @return the KafkaProducer
      */
     @Override
-    public Producer<String, SearchResults> get() {
+    public Producer<SearchResultsKey, SearchResults> get() {
         try {
             log.info("Creating Kafka producer");
 

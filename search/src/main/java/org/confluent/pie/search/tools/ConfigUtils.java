@@ -1,10 +1,12 @@
 package org.confluent.pie.search.tools;
 
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializerConfig;
+import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.confluent.pie.search.models.Credentials;
 import org.confluent.pie.search.models.SearchRequest;
+import org.confluent.pie.search.models.SearchResultsKeySerializer;
 import org.confluent.pie.search.models.SearchResultsSerializer;
 
 import java.io.IOException;
@@ -40,7 +42,7 @@ public class ConfigUtils {
         return new Properties() {{
             // User-specific properties that you must set
             put(BOOTSTRAP_SERVERS_CONFIG, brokerUrl);
-            put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
+            put(KEY_SERIALIZER_CLASS_CONFIG, SearchResultsKeySerializer.class.getCanonicalName());
             put(VALUE_SERIALIZER_CLASS_CONFIG, SearchResultsSerializer.class.getCanonicalName());
             put(ACKS_CONFIG, "all");
             if (credentials != null) {

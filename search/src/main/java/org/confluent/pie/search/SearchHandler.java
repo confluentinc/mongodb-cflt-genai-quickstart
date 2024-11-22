@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 @Slf4j
 public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> {
 
-    private final Lazy<Producer<String, SearchResults>> lazyProducer;
+    private final Lazy<Producer<SearchResultsKey, SearchResults>> lazyProducer;
     private final Lazy<SearchRequestDeserializer> searchRequestDeserializer;
     private final Lazy<DBService> dbService;
     private final String searchResultTopicName;
@@ -53,7 +53,7 @@ public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> 
      * @param searchResultTopicName       search result topic name
      */
     public SearchHandler(Supplier<DBService> mongoServiceSupplier,
-                         Supplier<Producer<String, SearchResults>> producerSupplier,
+                         Supplier<Producer<SearchResultsKey, SearchResults>> producerSupplier,
                          SearchRequestDeserializerSupplier requestDeserializerSupplier,
                          String searchResultTopicName) {
         dbService = new Lazy<>(mongoServiceSupplier);
@@ -78,9 +78,16 @@ public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> 
 
         searchRequests
                 .stream()
-                .map(request -> Pair.of(request, dbService.get().find(request)))
-                .map(products -> Pair.of(products.getLeft(), SearchResults.from(products)))
-                .map(products -> new ProducerRecord<>(searchResultTopicName, products.getLeft().requestId(), products.getRight()))
+                .map(request -> Pair.of(
+                        request,
+                        dbService.get().find(request)))
+                .map(products -> Pair.of(
+                        products.getLeft(),
+                        SearchResults.from(products)))
+                .map(products -> new ProducerRecord<>(
+                        searchResultTopicName,
+                        new SearchResultsKey(products.getLeft().requestId()),
+                        products.getRight()))
                 .forEach(record -> {
                     // Send the record
                     lazyProducer.get().send(record);
