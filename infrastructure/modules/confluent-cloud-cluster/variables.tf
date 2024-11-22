@@ -38,3 +38,39 @@ variable "confluent_cloud_environment" {
     name            = string
   })
 }
+
+variable "mongodb_user" {
+  description = ""
+  type        = string
+}
+variable "mongodb_password" {
+  description = ""
+  type        = string
+}
+variable "mongodb_host" {
+  description = ""
+  type        = string
+}
+
+variable "mongodbatlas_public_key" {
+  description = "Public API key to authenticate to Atlas"
+  type        = string
+}
+
+variable "mongodbatlas_private_key" {
+  description = "Private API key to authenticate to Atlas"
+  type        = string
+  sensitive   = true
+}
+
+variable "mongodbatlas_database" {
+  description = "Atlas database"
+  type        = string
+  default     = "genai"
+}
+
+variable "mongodbatlas_collection" {
+  description = "Atlas collection"
+  type        = string
+  default     = "all_insurance_products_embeddings"
+}

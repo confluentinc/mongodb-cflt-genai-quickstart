@@ -5,12 +5,34 @@ module "confluent_cloud_cluster" {
   confluent_cloud_service_provider = var.confluent_cloud_service_provider
   confluent_cloud_environment = {
     enable_creation = var.confluent_cloud_create_environment
-    name            = var.confluent_cloud_environmant_name
+    name            = var.confluent_cloud_environment_name
   }
   create_model_sql_files = local.create_model_sql_files
   insert_data_sql_files  = local.insert_data_sql_files
   create_table_sql_files = local.create_table_sql_files
+
+  mongodb_user = module.mongodb.connection_user
+  mongodb_password = module.mongodb.connection_password
+  mongodb_host = module.mongodb.host
+  mongodbatlas_public_key = var.mongodbatlas_public_key
+  mongodbatlas_private_key = var.mongodbatlas_private_key
+  mongodbatlas_database = var.mongodbatlas_database
+  mongodbatlas_collection = var.mongodbatlas_collection
+
+  depends_on = [
+    module.mongodb
+  ]
 }
+
+module "mongodb" {
+  source                           = "./modules/mongodb"
+  mongodbatlas_public_key = var.mongodbatlas_public_key
+  mongodbatlas_private_key = var.mongodbatlas_private_key
+  mongodbatlas_database = var.mongodbatlas_database
+  mongodbatlas_collection = var.mongodbatlas_collection
+  mongodbatlas_org_id = var.mongodbatlas_org_id
+}
+
 
 module "backend" {
   source                 = "./modules/backend"

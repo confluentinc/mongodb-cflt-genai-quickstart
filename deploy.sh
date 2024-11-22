@@ -100,6 +100,19 @@ if [ -z "$CONFLUENT_CLOUD_CREATE_ENVIRONMENT" ]; then
   fi
 fi
 
+# check for confluent cloud api key and secret
+if [ -z "$MONGODB_ORG_ID" ]; then
+  prompt_for_input MONGODB_ORG_ID "Enter your MongoDB Org ID" false
+fi
+
+if [ -z "$MONGODB_PUBLIC_KEY" ]; then
+  prompt_for_input MONGODB_PUBLIC_KEY "Enter your MongoDB Public Key" false
+fi
+
+if [ -z "$MONGODB_PRIVATE_KEY" ]; then
+  prompt_for_input MONGODB_PRIVATE_KEY "Enter your MongoDB Private Key" true
+fi
+
 # Create .env file from variables set in this file
 echo "[+] Setting up .env file for docker-compose"
 cat << EOF > .env
@@ -109,6 +122,9 @@ AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 CONFLUENT_CLOUD_API_KEY=$CONFLUENT_CLOUD_API_KEY
 CONFLUENT_CLOUD_API_SECRET=$CONFLUENT_CLOUD_API_SECRET
+MONGODB_PUBLIC_KEY=$MONGODB_PUBLIC_KEY
+MONGODB_PRIVATE_KEY=$MONGODB_PRIVATE_KEY
+MONGODB_ORG_ID=$MONGODB_ORG_ID
 EOF
 
 # Add AWS_SESSION_TOKEN to .env if it is set
@@ -126,6 +142,9 @@ confluent_cloud_create_environment=$([ "$CONFLUENT_CLOUD_CREATE_ENVIRONMENT" -eq
 path_to_flink_sql_create_table_statements = "statements/create-tables"
 path_to_flink_sql_create_model_statements = "statements/create-models"
 path_to_flink_sql_insert_statements = "statements/insert"
+mongodbatlas_public_key = "$MONGODB_PUBLIC_KEY"
+mongodbatlas_private_key = "$MONGODB_PRIVATE_KEY"
+mongodbatlas_org_id = "$MONGODB_ORG_ID"
 EOF
 
 echo "[+] Applying terraform"

@@ -1,7 +1,10 @@
 # Infrastructure
 
-This directory contains the Terraform configuration for the Confluent Cloud infrastructure. To run, you need to have the Confluent Cloud API Key and Secret. 
-See https://www.confluent.io/blog/confluent-terraform-provider-intro/#api-key for more details.
+This directory contains the Terraform configuration for the Confluent Cloud infrastructure. 
+
+To run, you need to have:
+- a Confluent Cloud API Key and Secret. See https://www.confluent.io/blog/confluent-terraform-provider-intro/#api-key for more details.
+- a MongoDB Atlas API Key and Secret. See TODO
 
 ## Terraform commands 
 
@@ -61,7 +64,7 @@ terraform output resource-ids
 | <a name="input_confluent_cloud_api_key"></a> [confluent\_cloud\_api\_key](#input\_confluent\_cloud\_api\_key) | Confluent Cloud API Key (also referred as Cloud API ID) with EnvironmentAdmin and AccountAdmin roles provided by Kafka Ops team | `string` | n/a | yes |
 | <a name="input_confluent_cloud_api_secret"></a> [confluent\_cloud\_api\_secret](#input\_confluent\_cloud\_api\_secret) | Confluent Cloud API Secret | `string` | n/a | yes |
 | <a name="input_confluent_cloud_create_environment"></a> [confluent\_cloud\_create\_environment](#input\_confluent\_cloud\_create\_environment) | Whether to create a new Confluent Cloud environment or not. Once the environment is created, it will be used for the rest of the resources. | `bool` | n/a | yes |
-| <a name="input_confluent_cloud_environmant_name"></a> [confluent\_cloud\_environmant\_name](#input\_confluent\_cloud\_environmant\_name) | The name of the Confluent Cloud environment to create | `string` | `"genai-demo"` | no |
+| <a name="input_confluent_cloud_environment_name"></a> [confluent\_cloud\_environment\_name](#input\_confluent\_cloud\_environment\_name) | The name of the Confluent Cloud environment to create | `string` | `"genai-demo"` | no |
 | <a name="input_confluent_cloud_region"></a> [confluent\_cloud\_region](#input\_confluent\_cloud\_region) | The region of Confluent Cloud Network | `string` | `"us-east-1"` | no |
 | <a name="input_confluent_cloud_service_provider"></a> [confluent\_cloud\_service\_provider](#input\_confluent\_cloud\_service\_provider) | The cloud provider of Confluent Cloud Network | `string` | `"AWS"` | no |
 | <a name="input_env_display_id_postfix"></a> [env\_display\_id\_postfix](#input\_env\_display\_id\_postfix) | A string that will be appended to different resources to make them unique. If not provided, a random string will be generated. | `string` | `null` | no |

@@ -14,3 +14,4 @@ CREATE TABLE
             'value.format' = 'json-registry',
             'value.fields-include' = 'all'
         );
+

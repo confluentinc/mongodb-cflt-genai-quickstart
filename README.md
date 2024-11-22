@@ -152,7 +152,7 @@ select userId, sessionId, messageId, input, embeddings, createdAt
 from `chat_input`, LATERAL TABLE (ML_PREDICT('bedrock_titan_embed', input));
 ```
 
-#### d Federated search in MongoDB Atlas
+#### d Federated search in MongoDB Atlas and results into a topic
 
 ```sql
 set
@@ -183,21 +183,27 @@ CREATE TABLE mongodb
       'mongodb.numCandidates' = '<number of candidates>'
       )
 
-    #
-  with those values, the search would be:
+CREATE TABLE search_result_table ( 
+	`sessionId` STRING, 
+	`messageId` STRING, 
+	`input` STRING, 
+	`search_results` 
+	ARRAY<ROW<
+		`product_id` STRING, 
+		`summary` STRING, 
+		`product_name` STRING, 
+		`product_type` STRING, 
+		`coverage_type` STRING, 
+		`repayment_frequency` STRING, 
+		rate_table` STRING, 
+		`min_price` DOUBLE, 
+		`max_price` DOUBLE, 
+		`refLink` STRING, 
+		`currency` STRING>> 
+); 
 
-SELECT sessionId, messageId, input, search_results
-FROM chat_input_embeddings, LATERAL TABLE (FEDERATED_SEARCH('mongodb', 3, embeddings));
-```
 
-The above search returns:
-
-```
-[sessionId: STRING, messageId: STRING, input: STRING, 
-search_results: ARRAY<
-    ROW<`product_id` STRING, `summary` STRING, `product_name` STRING, 
-        `product_type` STRING, `coverage_type` STRING, `repayment_frequency` STRING, `rate_table` STRING, 
-        `min_price` DOUBLE, `max_price` DOUBLE, `refLink` STRING, `currency` STRING>
-    >] 
-
+INSERT INTO search_result_table ( 
+	SELECT sessionId,messageId,input,search_results FROM `chat_input_embeddings`, 
+		LATERAL TABLE(FEDERATED_SEARCH('mongodb', 3, embedding)) );
 ```
