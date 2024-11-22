@@ -32,10 +32,9 @@ variable "insert_data_sql_files" {
 }
 
 variable "confluent_cloud_environment" {
-  description = "Whether to create a new Confluent Cloud environment or not. Once the environment is created "
+  description = "The environment configuration for Confluent Cloud"
   type = object({
-    enable_creation = bool
-    name            = string
+    name = string
   })
 }
 

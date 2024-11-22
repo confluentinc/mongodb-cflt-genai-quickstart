@@ -25,6 +25,7 @@ No modules.
 | [confluent_api_key.app-manager-flink-api-key](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/api_key) | resource |
 | [confluent_api_key.client_key](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/api_key) | resource |
 | [confluent_api_key.clients-schema-registry-api-key](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/api_key) | resource |
+| [confluent_connector.mongo-db-sink](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/connector) | resource |
 | [confluent_environment.staging](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/environment) | resource |
 | [confluent_flink_compute_pool.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/flink_compute_pool) | resource |
 | [confluent_flink_statement.create-models](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/flink_statement) | resource |
@@ -33,6 +34,15 @@ No modules.
 | [confluent_kafka_acl.app-client-describe-on-cluster](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
 | [confluent_kafka_acl.app-client-read-on-target-topic](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
 | [confluent_kafka_acl.app-client-write-to-data-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-create-on-dlq-lcc-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-create-on-error-lcc-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-create-on-success-lcc-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-describe-on-cluster](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-read-on-connect-lcc-group](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-read-on-target-topic](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-write-on-dlq-lcc-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-write-on-error-lcc-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
+| [confluent_kafka_acl.mongodb-sink-connector-write-on-success-lcc-topics](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_acl) | resource |
 | [confluent_kafka_cluster.standard](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/kafka_cluster) | resource |
 | [confluent_role_binding.app-manager-assigner](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
 | [confluent_role_binding.app-manager-flink-admin](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
@@ -42,6 +52,7 @@ No modules.
 | [confluent_role_binding.statements-runner-environment-admin](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/role_binding) | resource |
 | [confluent_service_account.app-manager](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [confluent_service_account.clients](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
+| [confluent_service_account.mongodb-sink-connector](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [confluent_service_account.statements-runner](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [null_resource.create-flink-bedrock-connections](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [confluent_environment.staging](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/environment) | data source |
@@ -54,13 +65,20 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_confluent_cloud_environment"></a> [confluent\_cloud\_environment](#input\_confluent\_cloud\_environment) | Whether to create a new Confluent Cloud environment or not. Once the environment is created | <pre>object({<br>    enable_creation = bool<br>    name            = string<br>  })</pre> | n/a | yes |
+| <a name="input_confluent_cloud_environment"></a> [confluent\_cloud\_environment](#input\_confluent\_cloud\_environment) | The environment configuration for Confluent Cloud | <pre>object({<br/>    name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_confluent_cloud_region"></a> [confluent\_cloud\_region](#input\_confluent\_cloud\_region) | The region of Confluent Cloud Network | `string` | n/a | yes |
 | <a name="input_confluent_cloud_service_provider"></a> [confluent\_cloud\_service\_provider](#input\_confluent\_cloud\_service\_provider) | The cloud provider of Confluent Cloud Network | `string` | n/a | yes |
 | <a name="input_create_model_sql_files"></a> [create\_model\_sql\_files](#input\_create\_model\_sql\_files) | The set of SQL files that contain the create model statements | `set(string)` | `[]` | no |
 | <a name="input_create_table_sql_files"></a> [create\_table\_sql\_files](#input\_create\_table\_sql\_files) | The set of SQL files that contain the create table statements | `set(string)` | `[]` | no |
 | <a name="input_env_display_id_postfix"></a> [env\_display\_id\_postfix](#input\_env\_display\_id\_postfix) | A random string we will be appending to resources like environment, api keys, etc. to make them unique | `string` | n/a | yes |
 | <a name="input_insert_data_sql_files"></a> [insert\_data\_sql\_files](#input\_insert\_data\_sql\_files) | The set of SQL files that contain the insert data statements | `set(string)` | `[]` | no |
+| <a name="input_mongodb_host"></a> [mongodb\_host](#input\_mongodb\_host) | n/a | `string` | n/a | yes |
+| <a name="input_mongodb_password"></a> [mongodb\_password](#input\_mongodb\_password) | n/a | `string` | n/a | yes |
+| <a name="input_mongodb_user"></a> [mongodb\_user](#input\_mongodb\_user) | n/a | `string` | n/a | yes |
+| <a name="input_mongodbatlas_collection"></a> [mongodbatlas\_collection](#input\_mongodbatlas\_collection) | Atlas collection | `string` | `"all_insurance_products_embeddings"` | no |
+| <a name="input_mongodbatlas_database"></a> [mongodbatlas\_database](#input\_mongodbatlas\_database) | Atlas database | `string` | `"genai"` | no |
+| <a name="input_mongodbatlas_private_key"></a> [mongodbatlas\_private\_key](#input\_mongodbatlas\_private\_key) | Private API key to authenticate to Atlas | `string` | n/a | yes |
+| <a name="input_mongodbatlas_public_key"></a> [mongodbatlas\_public\_key](#input\_mongodbatlas\_public\_key) | Public API key to authenticate to Atlas | `string` | n/a | yes |
 
 ## Outputs
 

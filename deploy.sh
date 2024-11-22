@@ -92,14 +92,6 @@ if [ -z "$CONFLUENT_CLOUD_API_SECRET" ]; then
   prompt_for_input CONFLUENT_CLOUD_API_SECRET "Enter your Confluent Cloud API Secret" true
 fi
 
-if [ -z "$CONFLUENT_CLOUD_CREATE_ENVIRONMENT" ]; then
-  if ! prompt_for_yes_no "Do you want to create a new Confluent Cloud environment?"; then
-    CONFLUENT_CLOUD_CREATE_ENVIRONMENT=1
-  else
-    CONFLUENT_CLOUD_CREATE_ENVIRONMENT=0
-  fi
-fi
-
 # check for confluent cloud api key and secret
 if [ -z "$MONGODB_ORG_ID" ]; then
   prompt_for_input MONGODB_ORG_ID "Enter your MongoDB Org ID" false
@@ -138,7 +130,6 @@ cat << EOF > infrastructure/variables.tfvars
 aws_region = "$AWS_REGION"
 confluent_cloud_api_key = "$CONFLUENT_CLOUD_API_KEY"
 confluent_cloud_api_secret = "$CONFLUENT_CLOUD_API_SECRET"
-confluent_cloud_create_environment=$([ "$CONFLUENT_CLOUD_CREATE_ENVIRONMENT" -eq 1 ] && echo "true" || echo "false")
 path_to_flink_sql_create_table_statements = "statements/create-tables"
 path_to_flink_sql_create_model_statements = "statements/create-models"
 path_to_flink_sql_insert_statements = "statements/insert"

@@ -5,9 +5,7 @@ data "confluent_organization" "main" {}
 # ------------------------------------------------------
 
 resource "confluent_environment" "staging" {
-  count        = var.confluent_cloud_environment.enable_creation ? 1 : 0
-  display_name = var.confluent_cloud_environment.name
-
+  display_name = "${var.confluent_cloud_environment.name}-${var.env_display_id_postfix}"
   stream_governance {
     package = "ESSENTIALS"
   }
@@ -237,7 +235,7 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-target-topic" {
     id = confluent_kafka_cluster.standard.id
   }
   resource_type = "TOPIC"
-  resource_name = "products_embeddings"  // TODO replace with var
+  resource_name = "products_embeddings" // TODO replace with var
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
   host          = "*"
