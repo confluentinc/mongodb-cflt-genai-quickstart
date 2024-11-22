@@ -1,16 +1,19 @@
-CREATE TABLE all_insurance_products
+CREATE TABLE products
 (
     product_id          STRING PRIMARY KEY NOT ENFORCED,
-    product_name        STRING,
-    product_type        STRING,
-    coverage_type       STRING,
-    repayment_frequency STRING,
-    rate_table          STRING,
-    min_price DOUBLE,
-    max_price DOUBLE,
-    refLink             STRING,
+    description         STRING,
+    type                STRING,
+    name                STRING,
     currency            STRING,
+    term_min_length     STRING,
+    term_max_length     STRING,
+    repayment_frequency STRING,
+    risk_level          STRING,
+    status              STRING,
+    rate_table          STRING,
     createdAt           TIMESTAMP_LTZ (3),
+    updatedAt           TIMESTAMP_LTZ (3),
+    ref_link            STRING,
     WATERMARK FOR createdAt AS createdAt
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH

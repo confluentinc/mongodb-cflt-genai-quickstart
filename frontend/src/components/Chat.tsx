@@ -48,16 +48,18 @@ export default function Chat() {
 
 
         // TODO: Update userId with actual user ID
-        const clientMessage: ClientMessage = {
-            userId: "blah",
-            input: input
-        }
         const chatMessage: ChatMessage = {
             role: "client",
-            userId: clientMessage.userId,
-            data: clientMessage.input
+            userId: "blah",
+            data: input
         }
         setMessageHistory((prev) => prev.concat(chatMessage));
+        const clientMessage: ClientMessage = {
+            userId: chatMessage.userId,
+            input: messageHistory.map((message) => (message.role === "client" ? "Human: " : "Assistant: ") + message.data).join("\n") + (messageHistory.length > 0 ? "\nHuman: " : "Human: ") + input
+        }
+
+        console.log(clientMessage);
 
         sendJsonMessage(clientMessage);
         setInput("");
@@ -66,7 +68,7 @@ export default function Chat() {
     return (
         <>
             <h1 className="text-3xl mb-6 font-bold text-center">
-                Friendly Neighbourhood Insurance Corp.
+                Friendly Neighbourhood Bank
             </h1>
             <div className="flex flex-col flex-grow w-full max-w-screen-lg rounded-lg h-96 overflow-y-auto">
                 <ChatMessages messages={messageHistory}/>

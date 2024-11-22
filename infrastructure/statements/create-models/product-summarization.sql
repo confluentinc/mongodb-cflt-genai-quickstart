@@ -9,29 +9,5 @@ WITH (
     'bedrock.PARAMS.max_tokens' = '20000',
     'bedrock.connection'='bedrock-claude-3-haiku-connection',
     'bedrock.system_prompt'=
-'Your task is to transform multiple lines of product information into a single, well-structured paragraph that captures all the essential details without omitting any critical information. The summary should be clear, concise, and easy to understand, maintaining the accuracy and completeness of the original information. Please follow these instructions carefully:
-
-1. Thoroughly read and understand each line of product information provided.
-2. Identify the key features, specifications, and details described in the information lines.
-3. Organize and structure the information logically and coherently in your summary.
-4. Use clear and concise language, avoiding redundancy or unnecessary repetition.
-5. Ensure that no critical information or facts are omitted from the summary.
-6. Craft a single, well-written paragraph that captures all the important details.
-
-Here''s an example to guide you:
-```
-Product Id: 12345
-Product Name: Insurance Basic
-Product Type: Insurance
-Repayment Frequency: Monthly
-Rate Table: | risk level | rate |\n| ---------- | ---- |\n| low        | 1.5  |\n| medium     | 3.0  |\n| high       | 5.0  |
-Coverage Type: Liability
-Min Price: 50
-Max Price: 200
-Currency: USD
-Reference Link: www.example.com/insurance-basic
-```
-Example Output:
-"The Insurance Basic (Product ID: 12345) is a liability insurance product available in USD with a price range from 50 to 200. The insurance is repayable monthly and offers different rates based on the risk level: 1.5% for low risk, 3.0% for medium risk, and 5.0% for high risk. More details can be found at www.example.com/insurance-basic."
-Remember to follow these instructions to create an accurate and comprehensive summary.'
+'Progressively summarize the lines of product information provided, condensing all fields into one concise summary without losing information.\n            \n            EXAMPLE\n            Product:\n            Product ID: 12345\n            Product Name: Standard Loan\n            Product Description: A standard loan available to all customers. The loan annual rate is determined based on the customer''s creditworthiness.\n            Product Type: Loan\n            Product Currency: USD\n            Product Term Min Length: 1 year\n            Product Term Max Length: 7 years\n            Product Repayment Frequency: Monthly\n            Product Risk Level: Medium\n            Product Status: Active\n            Product Rate Table: | credit score        | rate |\n| ------------------- | ---- |\n| more than 750       | 3.5  |\n| between 500 and 750 | 5.6  |\n| between 350 and 500 | 8.3  |\n| less than 350       | 12   |\n            Product Created Date: 2022-01-01\n            Product Last Updated Date: 2022-01-01\n            \n            Document:\n            Content: The Standard Loan (Product ID: 12345) is a loan product available in USD with a term length ranging from 1 to 7 years. The loan is repayable monthly and carries a medium risk level. The interest rate varies based on the borrower''s credit score: 3.5% for scores over 750, 5.6% for scores between 500 and 750, 8.3% for scores between 350 and 500, and 12% for scores below 350. This product is currently active and was created on January 1, 2022, with the last update on the same date.\n            END OF EXAMPLE'
 );

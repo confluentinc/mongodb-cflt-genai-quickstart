@@ -129,7 +129,7 @@ path_to_flink_sql_insert_statements = "statements/insert"
 EOF
 
 echo "[+] Applying terraform"
-docker compose run --rm terraform apply --auto-approve -var-file=variables.tfvars
+docker compose run --remove-orphans --rm terraform apply --auto-approve -var-file=variables.tfvars
 if [ $? -ne 0 ]; then
   echo "[-] Failed to apply terraform"
   exit 1

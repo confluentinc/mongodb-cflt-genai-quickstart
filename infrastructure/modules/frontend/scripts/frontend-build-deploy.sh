@@ -10,7 +10,7 @@ fi
 WS_URL=$1
 BUCKET_NAME=$2
 
-
+source ~/.bashrc
 cd ../frontend
 echo "WS_URL=$WS_URL" > .env
 (npm i && npm run clean && npm run build) >&2

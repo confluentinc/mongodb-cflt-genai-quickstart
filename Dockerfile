@@ -16,7 +16,9 @@ RUN dnf config-manager --add-repo https://packages.confluent.io/confluent-cli/rp
 RUN touch ~/.bashrc && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
     source ~/.bashrc && \
-    nvm install 20 \
+    nvm install 20 && \
+    nvm use 20 && \
+    nvm alias default 20 \
 
 WORKDIR /app
 
