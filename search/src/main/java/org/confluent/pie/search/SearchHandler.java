@@ -81,13 +81,10 @@ public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> 
                 .map(request -> Pair.of(
                         request,
                         dbService.get().find(request)))
-                .map(products -> Pair.of(
-                        products.getLeft(),
-                        SearchResults.from(products)))
                 .map(products -> new ProducerRecord<>(
                         searchResultTopicName,
-                        new SearchResultsKey(products.getLeft().requestId()),
-                        products.getRight()))
+                        new SearchResultsKey(products),
+                        new SearchResults(products)))
                 .forEach(record -> {
                     // Send the record
                     lazyProducer.get().send(record);
