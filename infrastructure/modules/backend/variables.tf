@@ -41,3 +41,50 @@ variable "kafka_api_key" {
     secret = string
   })
 }
+
+variable "mongodb_db_user" {
+  description = "The DB user credentials for the MongoDB database"
+  type = object({
+    id     = string
+    secret = string
+  })
+}
+
+variable "mongodb_db_info" {
+  description = "The information needed to connect to the MongoDB database"
+  type = object({
+    host    = string
+    db_name = string
+  })
+}
+
+variable "mongodb_vectorsearch_info" {
+  description = "The information needed to connect to the MongoDB database for vector search"
+  type = object({
+    collection_name = string
+    index_name      = string
+    field_path      = string
+  })
+}
+
+variable "vectorsearch_topics_info" {
+  description = "The relevant kafka topics that the vectorsearch lambda function will connect to"
+  type = object({
+    input_topic  = string
+    output_topic = string
+  })
+  default = {
+    input_topic  = "chat_input"
+    output_topic = "chat_output"
+  }
+}
+
+variable "connections_api_topics_info" {
+  description = "The relevant kafka topics that the connections API lambda function will interact with. `input_topic` is what the lambda function will consume from."
+  type = object({
+    input_topic = string
+  })
+  default = {
+    input_topic = "chat_output"
+  }
+}

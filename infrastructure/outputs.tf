@@ -43,3 +43,16 @@ output "frontend_url" {
 output "websocket_endpoint" {
   value = module.backend.websocket_endpoint
 }
+
+output "mongodb_host" {
+  value = module.mongodb.host
+}
+
+output "mongodb_db_user" {
+  value = module.mongodb.connection_user
+}
+
+output "mongodb_db_password" {
+  value     = module.mongodb.connection_password
+  sensitive = true
+}

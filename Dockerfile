@@ -12,6 +12,11 @@ RUN dnf config-manager --add-repo https://packages.confluent.io/confluent-cli/rp
     dnf -y install confluent-cli && \
     dnf clean all
 
+# install java
+RUN dnf -y install java-17 && \
+    dnf -y install maven && \
+    dnf clean all
+
 # install nodejs 20 for frontend builds
 RUN touch ~/.bashrc && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \

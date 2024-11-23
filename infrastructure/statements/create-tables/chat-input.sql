@@ -1,11 +1,11 @@
 CREATE TABLE
-    chat_input (
-                   sessionId STRING PRIMARY KEY NOT ENFORCED,
-                   userId STRING,
-                   messageId STRING,
-                   input String,
-                   createdAt TIMESTAMP_LTZ(3),
-                   WATERMARK FOR createdAt AS createdAt
+    chat_input
+(
+    sessionId STRING PRIMARY KEY NOT ENFORCED,
+    userId    STRING,
+    messageId STRING,
+    `input`     STRING,
+    createdAt TIMESTAMP_LTZ(3)
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH
         (

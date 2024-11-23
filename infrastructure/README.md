@@ -32,7 +32,7 @@ terraform output resource-ids
 | Name | Version |
 |------|---------|
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.76.0 |
-| <a name="requirement_confluent"></a> [confluent](#requirement\_confluent) | ~> 2.5.0 |
+| <a name="requirement_confluent"></a> [confluent](#requirement\_confluent) | ~> 2.11.0 |
 
 ## Providers
 
@@ -48,6 +48,7 @@ terraform output resource-ids
 | <a name="module_backend"></a> [backend](#module\_backend) | ./modules/backend | n/a |
 | <a name="module_confluent_cloud_cluster"></a> [confluent\_cloud\_cluster](#module\_confluent\_cloud\_cluster) | ./modules/confluent-cloud-cluster | n/a |
 | <a name="module_frontend"></a> [frontend](#module\_frontend) | ./modules/frontend | n/a |
+| <a name="module_mongodb"></a> [mongodb](#module\_mongodb) | ./modules/mongodb | n/a |
 
 ## Resources
 
@@ -63,11 +64,19 @@ terraform output resource-ids
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region to deploy the infrastructure | `string` | `"us-east-1"` | no |
 | <a name="input_confluent_cloud_api_key"></a> [confluent\_cloud\_api\_key](#input\_confluent\_cloud\_api\_key) | Confluent Cloud API Key (also referred as Cloud API ID) with EnvironmentAdmin and AccountAdmin roles provided by Kafka Ops team | `string` | n/a | yes |
 | <a name="input_confluent_cloud_api_secret"></a> [confluent\_cloud\_api\_secret](#input\_confluent\_cloud\_api\_secret) | Confluent Cloud API Secret | `string` | n/a | yes |
-| <a name="input_confluent_cloud_create_environment"></a> [confluent\_cloud\_create\_environment](#input\_confluent\_cloud\_create\_environment) | Whether to create a new Confluent Cloud environment or not. Once the environment is created, it will be used for the rest of the resources. | `bool` | n/a | yes |
 | <a name="input_confluent_cloud_environment_name"></a> [confluent\_cloud\_environment\_name](#input\_confluent\_cloud\_environment\_name) | The name of the Confluent Cloud environment to create | `string` | `"genai-demo"` | no |
 | <a name="input_confluent_cloud_region"></a> [confluent\_cloud\_region](#input\_confluent\_cloud\_region) | The region of Confluent Cloud Network | `string` | `"us-east-1"` | no |
 | <a name="input_confluent_cloud_service_provider"></a> [confluent\_cloud\_service\_provider](#input\_confluent\_cloud\_service\_provider) | The cloud provider of Confluent Cloud Network | `string` | `"AWS"` | no |
 | <a name="input_env_display_id_postfix"></a> [env\_display\_id\_postfix](#input\_env\_display\_id\_postfix) | A string that will be appended to different resources to make them unique. If not provided, a random string will be generated. | `string` | `null` | no |
+| <a name="input_mongodbatlas_cloud_provider"></a> [mongodbatlas\_cloud\_provider](#input\_mongodbatlas\_cloud\_provider) | Cloud provider | `string` | `"AWS"` | no |
+| <a name="input_mongodbatlas_cloud_region"></a> [mongodbatlas\_cloud\_region](#input\_mongodbatlas\_cloud\_region) | Cloud provider region name (note that MongoDB values are different than usual Cloud provider ones) | `string` | `"US_EAST_1"` | no |
+| <a name="input_mongodbatlas_cluster"></a> [mongodbatlas\_cluster](#input\_mongodbatlas\_cluster) | Atlas cluster | `string` | `"genai"` | no |
+| <a name="input_mongodbatlas_collection"></a> [mongodbatlas\_collection](#input\_mongodbatlas\_collection) | Atlas collection | `string` | `"products_summarized_with_embeddings"` | no |
+| <a name="input_mongodbatlas_database"></a> [mongodbatlas\_database](#input\_mongodbatlas\_database) | Atlas database | `string` | `"genai"` | no |
+| <a name="input_mongodbatlas_org_id"></a> [mongodbatlas\_org\_id](#input\_mongodbatlas\_org\_id) | Organization ID | `string` | n/a | yes |
+| <a name="input_mongodbatlas_private_key"></a> [mongodbatlas\_private\_key](#input\_mongodbatlas\_private\_key) | Private API key to authenticate to Atlas | `string` | n/a | yes |
+| <a name="input_mongodbatlas_project"></a> [mongodbatlas\_project](#input\_mongodbatlas\_project) | Atlas project | `string` | `"Demo"` | no |
+| <a name="input_mongodbatlas_public_key"></a> [mongodbatlas\_public\_key](#input\_mongodbatlas\_public\_key) | Public API key to authenticate to Atlas | `string` | n/a | yes |
 | <a name="input_path_to_flink_sql_create_model_statements"></a> [path\_to\_flink\_sql\_create\_model\_statements](#input\_path\_to\_flink\_sql\_create\_model\_statements) | The path to the SQL statements that will be used to create model in Flink | `string` | `null` | no |
 | <a name="input_path_to_flink_sql_create_table_statements"></a> [path\_to\_flink\_sql\_create\_table\_statements](#input\_path\_to\_flink\_sql\_create\_table\_statements) | The path to the SQL statements that will be used to create tables in Flink | `string` | `null` | no |
 | <a name="input_path_to_flink_sql_insert_statements"></a> [path\_to\_flink\_sql\_insert\_statements](#input\_path\_to\_flink\_sql\_insert\_statements) | The path to the SQL statements that will be used to insert data in Flink | `string` | `null` | no |
@@ -83,6 +92,9 @@ terraform output resource-ids
 | <a name="output_flink_environment_id"></a> [flink\_environment\_id](#output\_flink\_environment\_id) | Confluent Cloud Flink Environment ID |
 | <a name="output_flink_rest_endpoint"></a> [flink\_rest\_endpoint](#output\_flink\_rest\_endpoint) | Flink REST endpoint |
 | <a name="output_frontend_url"></a> [frontend\_url](#output\_frontend\_url) | n/a |
+| <a name="output_mongodb_db_password"></a> [mongodb\_db\_password](#output\_mongodb\_db\_password) | n/a |
+| <a name="output_mongodb_db_user"></a> [mongodb\_db\_user](#output\_mongodb\_db\_user) | n/a |
+| <a name="output_mongodb_host"></a> [mongodb\_host](#output\_mongodb\_host) | n/a |
 | <a name="output_schema_registry_url"></a> [schema\_registry\_url](#output\_schema\_registry\_url) | URL for the Schema Registry |
 | <a name="output_websocket_endpoint"></a> [websocket\_endpoint](#output\_websocket\_endpoint) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

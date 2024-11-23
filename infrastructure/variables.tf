@@ -34,11 +34,6 @@ variable "env_display_id_postfix" {
   nullable    = true
 }
 
-variable "confluent_cloud_create_environment" {
-  description = "Whether to create a new Confluent Cloud environment or not. Once the environment is created, it will be used for the rest of the resources."
-  type        = bool
-}
-
 variable "confluent_cloud_environment_name" {
   description = "The name of the Confluent Cloud environment to create"
   type        = string
@@ -84,14 +79,14 @@ variable "mongodbatlas_private_key" {
 
 variable "mongodbatlas_cloud_provider" {
   description = "Cloud provider"
-  type = string
-  default = "AWS"
+  type        = string
+  default     = "AWS"
 }
 
 variable "mongodbatlas_cloud_region" {
   description = "Cloud provider region name (note that MongoDB values are different than usual Cloud provider ones)"
-  type = string
-  default = "US_EAST_1"
+  type        = string
+  default     = "US_EAST_1"
 }
 
 variable "mongodbatlas_project" {
@@ -115,5 +110,5 @@ variable "mongodbatlas_database" {
 variable "mongodbatlas_collection" {
   description = "Atlas collection"
   type        = string
-  default     = "products_embeddings"
+  default     = "products_summarized_with_embeddings"
 }

@@ -11,10 +11,9 @@ CREATE TABLE products
     risk_level          STRING,
     status              STRING,
     rate_table          STRING,
-    createdAt           TIMESTAMP_LTZ (3),
-    updatedAt           TIMESTAMP_LTZ (3),
-    ref_link            STRING,
-    WATERMARK FOR createdAt AS createdAt
+    createdAt           STRING,
+    updatedAt           STRING,
+    ref_link            STRING
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH
         (

@@ -1,12 +1,11 @@
 CREATE TABLE chat_input_embeddings
 (
-    userId     STRING PRIMARY KEY NOT ENFORCED,
-    sessionId  STRING,
-    messageId  STRING,
-    input      STRING,
-    embeddings ARRAY<FLOAT>,
-    createdAt  TIMESTAMP_LTZ(3),
-    WATERMARK FOR createdAt AS createdAt
+    requestId         STRING PRIMARY KEY NOT ENFORCED,
+    embeddings        ARRAY<FLOAT>,
+    numberOfCandidate INT,
+    `limit`             INT,
+    minScore DOUBLE,
+    metadata          ROW(`input` STRING, `userid` STRING, `messageId` STRING)
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH
         (

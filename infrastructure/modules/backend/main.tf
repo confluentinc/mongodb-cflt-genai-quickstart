@@ -1,3 +1,7 @@
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
 module "aws_websocket_api" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
@@ -145,23 +149,44 @@ module "websocket_chat_api_lambda" {
   ]
 }
 
-################################################################################
-# Lambda Trigger Connections Api
-################################################################################
-
 # Required for the Lambda function to connect to the Kafka cluster
 resource "aws_secretsmanager_secret" "confluent_cloud_genai_demo" {
   name                    = "confluent/chatbot-api/creds/${var.env_display_id_postfix}"
   recovery_window_in_days = 0
 }
 
+resource "aws_secretsmanager_secret" "confluent_cloud_schema_registry" {
+  name                    = "confluent/vectorsearch/schema-registry/creds/${var.env_display_id_postfix}"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret" "mongodb" {
+  name                    = "confluent/vectorsearch/mongo/creds/${var.env_display_id_postfix}"
+  recovery_window_in_days = 0
+}
+
 
 resource "aws_secretsmanager_secret_version" "confluent_cloud_genai_demo_version" {
   secret_id = aws_secretsmanager_secret.confluent_cloud_genai_demo.id
-  # format of the string is {"username":"my-username","password":"my-password"}
   secret_string = jsonencode({
     "username" : var.kafka_api_key.id,
     "password" : var.kafka_api_key.secret
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "confluent_cloud_schema_registry_version" {
+  secret_id = aws_secretsmanager_secret.confluent_cloud_schema_registry.id
+  secret_string = jsonencode({
+    "username" : var.schema_registry_api_key.id,
+    "password" : var.schema_registry_api_key.secret
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "mongodb_version" {
+  secret_id = aws_secretsmanager_secret.confluent_cloud_schema_registry.id
+  secret_string = jsonencode({
+    "username" : var.mongodb_db_user.id,
+    "password" : var.mongodb_db_user.secret
   })
 }
 
@@ -202,7 +227,7 @@ module "lambda_trigger_connections_api" {
     self_managed_kafka = {
       batch_size        = 1
       starting_position = "LATEST"
-      topics            = ["chat_output"]
+      topics            = [var.connections_api_topics_info.input_topic]
       self_managed_event_source = [
         {
           endpoints = {
@@ -240,4 +265,90 @@ module "lambda_trigger_connections_api" {
   depends_on = [
     module.websocket_chat_api_lambda_layer
   ]
+}
+
+module "lambda_trigger_vector_search" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "~> 4.0"
+
+  function_name = "GenAiDemoKafkaTriggerVectorSearch-${var.env_display_id_postfix}"
+
+  attach_cloudwatch_logs_policy     = true
+  cloudwatch_logs_retention_in_days = 1
+
+  description   = "GenAi Demo Kafka Trigger Vector Search"
+  handler       = "io.confluent.pie.search.SearchHandler::handleRequest"
+  runtime       = "java17"
+  architectures = [var.system_architecture]
+  timeout       = 30
+
+  environment_variables = {
+    SR_URL    = var.schema_registry_url
+    SR_SECRET = aws_secretsmanager_secret.confluent_cloud_schema_registry.name
+    # Change this to be the path to the aws secret manager secret
+    KAFKA_SECRET_KEY      = aws_secretsmanager_secret.confluent_cloud_genai_demo.name
+    BROKER                = var.bootstrap_servers
+    MONGO_CREDENTIALS     = aws_secretsmanager_secret.mongodb.name
+    MONGO_HOST            = var.mongodb_db_info.host
+    MONGO_DB_NAME         = var.mongodb_db_info.db_name
+    MONGO_COLLECTION_NAME = var.mongodb_vectorsearch_info.collection_name
+    MONGO_INDEX_NAME      = var.mongodb_vectorsearch_info.index_name
+    MONGO_FIELD_PATH      = var.mongodb_vectorsearch_info.field_path
+    SEARCH_RESULT_TOPIC   = var.vectorsearch_topics_info.output_topic
+  }
+
+  layers = [
+    local.selected_extension_arn
+  ]
+
+  source_path = [
+    {
+      path = "${path.module}/search/",
+      commands = [
+        "mvn clean package",
+        "cd target/output",
+        ":zip"
+      ]
+    }
+  ]
+
+  publish = true
+
+  event_source_mapping = {
+    self_managed_kafka = {
+      batch_size        = 1
+      starting_position = "LATEST"
+      topics            = [var.vectorsearch_topics_info.input_topic]
+      self_managed_event_source = [
+        {
+          endpoints = {
+            KAFKA_BOOTSTRAP_SERVERS = var.bootstrap_servers
+          }
+        }
+      ]
+      self_managed_kafka_event_source_config = [
+        {
+          consumer_group_id = "genai-demo-lambda-vector-search-${var.env_display_id_postfix}"
+        }
+      ]
+      source_access_configuration = [
+        {
+          type = "BASIC_AUTH",
+          uri  = aws_secretsmanager_secret.confluent_cloud_genai_demo.arn
+        },
+      ]
+    }
+  }
+  attach_policy_statements = true
+  policy_statements = {
+    secrets_manager_get_value = {
+      effect  = "Allow",
+      actions = ["secretsmanager:GetSecretValue"],
+      resources = [
+        aws_secretsmanager_secret.confluent_cloud_genai_demo.arn,
+        aws_secretsmanager_secret.confluent_cloud_schema_registry.arn, aws_secretsmanager_secret.mongodb.arn
+      ]
+    }
+  }
+
 }

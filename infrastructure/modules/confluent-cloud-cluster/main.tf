@@ -17,17 +17,14 @@ resource "confluent_environment" "staging" {
 }
 
 data "confluent_environment" "staging" {
-  display_name = var.confluent_cloud_environment.name
-  depends_on = [
-    confluent_environment.staging
-  ]
+  id = confluent_environment.staging.id
 }
 
 # ------------------------------------------------------
 # KAFKA
 # ------------------------------------------------------
 
-// In Confluent Cloud, an environment is mapped to a Flink catalog, and a Kafka cluster is mapped to a Flink database.
+# In Confluent Cloud, an environment is mapped to a Flink catalog, and a Kafka cluster is mapped to a Flink database.
 resource "confluent_kafka_cluster" "standard" {
   display_name = "genai-demo-${var.env_display_id_postfix}"
   availability = "SINGLE_ZONE"
@@ -55,10 +52,6 @@ data "confluent_schema_registry_cluster" "essentials" {
 # ------------------------------------------------------
 # FLINK
 # ------------------------------------------------------
-data "confluent_flink_region" "main" {
-  cloud  = var.confluent_cloud_service_provider
-  region = var.confluent_cloud_region
-}
 
 # https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html#step-1-create-a-af-compute-pool
 resource "confluent_flink_compute_pool" "main" {
@@ -75,6 +68,11 @@ resource "confluent_flink_compute_pool" "main" {
     confluent_role_binding.app-manager-flink-developer,
     confluent_api_key.app-manager-flink-api-key,
   ]
+}
+
+data "confluent_flink_region" "main" {
+  cloud  = var.confluent_cloud_service_provider
+  region = var.confluent_cloud_region
 }
 
 data "confluent_flink_compute_pool" "main" {
@@ -193,6 +191,8 @@ resource "confluent_flink_statement" "insert-data" {
     key    = confluent_api_key.app-manager-flink-api-key.id
     secret = confluent_api_key.app-manager-flink-api-key.secret
   }
+
+  stopped   = false
   statement = file(abspath(each.value))
 
   depends_on = [
@@ -211,216 +211,6 @@ resource "confluent_service_account" "mongodb-sink-connector" {
   description  = "Service account of the MongoDB Sink Connector"
 }
 
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-describe-on-cluster" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "CLUSTER"
-  resource_name = "kafka-cluster"
-  pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "DESCRIBE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-target-topic" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "products_embeddings" // TODO replace with var
-  pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "READ"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-dlq-lcc-topics" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "dlq-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "CREATE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-dlq-lcc-topics" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "dlq-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "WRITE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-success-lcc-topics" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "success-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "CREATE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-success-lcc-topics" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "success-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "WRITE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-error-lcc-topics" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "error-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "CREATE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-error-lcc-topics" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "TOPIC"
-  resource_name = "error-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "WRITE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-connect-lcc-group" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-  resource_type = "GROUP"
-  resource_name = "connect-products_embeddings"
-  pattern_type  = "PREFIXED"
-  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
-  host          = "*"
-  operation     = "READ"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
-  credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
-  }
-}
-
-resource "confluent_connector" "mongo-db-sink" {
-  environment {
-    id = confluent_environment.staging[0].id
-  }
-  kafka_cluster {
-    id = confluent_kafka_cluster.standard.id
-  }
-
-  // Block for custom *sensitive* configuration properties that are labelled with "Type: password" under "Configuration Properties" section in the docs:
-  // https://docs.confluent.io/cloud/current/connectors/cc-mongo-db-sink.html#configuration-properties
-  config_sensitive = {
-    "connection.password" = var.mongodb_password,
-  }
-
-  // Block for custom *nonsensitive* configuration properties that are *not* labelled with "Type: password" under "Configuration Properties" section in the docs:
-  // https://docs.confluent.io/cloud/current/connectors/cc-mongo-db-sink.html#configuration-properties
-  config_nonsensitive = {
-    "connector.class"          = "MongoDbAtlasSink"
-    "name"                     = "confluent-mongodb-sink"
-    "kafka.auth.mode"          = "SERVICE_ACCOUNT"
-    "kafka.service.account.id" = confluent_service_account.mongodb-sink-connector.id
-    "connection.host"          = var.mongodb_host
-    "connection.user"          = var.mongodb_user
-    "input.data.format"        = "JSON_SR"
-    "topics"                   = "products_embeddings" // TODO replace with var?
-    "max.num.retries"          = "3"
-    "retries.defer.timeout"    = "5000"
-    "max.batch.size"           = "0"
-    "database"                 = var.mongodbatlas_database
-    "collection"               = var.mongodbatlas_collection
-    "tasks.max"                = "1"
-  }
-
-  depends_on = [
-    confluent_kafka_acl.mongodb-sink-connector-describe-on-cluster,
-    confluent_kafka_acl.mongodb-sink-connector-read-on-target-topic,
-    confluent_kafka_acl.mongodb-sink-connector-create-on-dlq-lcc-topics,
-    confluent_kafka_acl.mongodb-sink-connector-write-on-dlq-lcc-topics,
-    confluent_kafka_acl.mongodb-sink-connector-create-on-success-lcc-topics,
-    confluent_kafka_acl.mongodb-sink-connector-write-on-success-lcc-topics,
-    confluent_kafka_acl.mongodb-sink-connector-create-on-error-lcc-topics,
-    confluent_kafka_acl.mongodb-sink-connector-write-on-error-lcc-topics,
-    confluent_kafka_acl.mongodb-sink-connector-read-on-connect-lcc-group,
-    # also depends on the Flink scripts
-    confluent_flink_statement.insert-data,
-  ]
-}
 # ------------------------------------------------------
 # SERVICE ACCOUNTS
 # ------------------------------------------------------
@@ -479,6 +269,12 @@ resource "confluent_role_binding" "client-kafka-cluster-admin" {
   crn_pattern = confluent_kafka_cluster.standard.rbac_crn
 }
 
+resource "confluent_role_binding" "mongodb-sink-connector-cluster-admin" {
+  principal   = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  role_name   = "CloudClusterAdmin"
+  crn_pattern = confluent_kafka_cluster.standard.rbac_crn
+}
+
 resource "confluent_role_binding" "client-schema-registry-developer-write" {
   principal   = "User:${confluent_service_account.clients.id}"
   crn_pattern = "${data.confluent_schema_registry_cluster.essentials.resource_name}/subject=*"
@@ -506,7 +302,7 @@ resource "confluent_api_key" "app-manager-flink-api-key" {
   }
 }
 
-resource "confluent_api_key" "client_key" {
+resource "confluent_api_key" "client-key" {
   display_name = "clients-api-key-${var.env_display_id_postfix}"
   description  = "client API Key"
   owner {
@@ -542,6 +338,24 @@ resource "confluent_api_key" "clients-schema-registry-api-key" {
   }
 }
 
+resource "confluent_api_key" "mongodb-sink-connector-key" {
+  display_name = "mongodb-sink-connector-api-key-${var.env_display_id_postfix}"
+  description  = "MongoDB Connector API Key"
+  owner {
+    id          = confluent_service_account.mongodb-sink-connector.id
+    api_version = confluent_service_account.mongodb-sink-connector.api_version
+    kind        = confluent_service_account.mongodb-sink-connector.kind
+  }
+  managed_resource {
+    id          = confluent_kafka_cluster.standard.id
+    api_version = confluent_kafka_cluster.standard.api_version
+    kind        = confluent_kafka_cluster.standard.kind
+    environment {
+      id = data.confluent_environment.staging.id
+    }
+  }
+}
+
 # ------------------------------------------------------
 # Client Acls
 # ------------------------------------------------------
@@ -559,8 +373,8 @@ resource "confluent_kafka_acl" "app-client-describe-on-cluster" {
   permission    = "ALLOW"
   rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
   credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
+    key    = confluent_api_key.client-key.id
+    secret = confluent_api_key.client-key.secret
   }
 }
 
@@ -577,8 +391,8 @@ resource "confluent_kafka_acl" "app-client-read-on-target-topic" {
   permission    = "ALLOW"
   rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
   credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
+    key    = confluent_api_key.client-key.id
+    secret = confluent_api_key.client-key.secret
   }
 }
 
@@ -595,7 +409,218 @@ resource "confluent_kafka_acl" "app-client-write-to-data-topics" {
   permission    = "ALLOW"
   rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
   credentials {
-    key    = confluent_api_key.client_key.id
-    secret = confluent_api_key.client_key.secret
+    key    = confluent_api_key.client-key.id
+    secret = confluent_api_key.client-key.secret
   }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-describe-on-cluster" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "CLUSTER"
+  resource_name = "kafka-cluster"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "DESCRIBE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-target-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "products_summarized_with_embeddings" // TODO replace with var
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "READ"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-dlq-lcc-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "dlq-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "CREATE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-dlq-lcc-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "dlq-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "WRITE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-success-lcc-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "success-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "CREATE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-success-lcc-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "success-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "WRITE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-error-lcc-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "error-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "CREATE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-error-lcc-topics" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "error-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "WRITE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-connect-lcc-group" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "GROUP"
+  resource_name = "connect-"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.mongodb-sink-connector.id}"
+  host          = "*"
+  operation     = "READ"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.mongodb-sink-connector-key.id
+    secret = confluent_api_key.mongodb-sink-connector-key.secret
+  }
+}
+
+
+resource "confluent_connector" "mongo-db-sink" {
+  environment {
+    id = data.confluent_environment.staging.id
+  }
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+
+  // Block for custom *sensitive* configuration properties that are labelled with "Type: password" under "Configuration Properties" section in the docs:
+  // https://docs.confluent.io/cloud/current/connectors/cc-mongo-db-sink.html#configuration-properties
+  config_sensitive = {
+    "connection.password" = var.mongodb_password,
+  }
+
+  // Block for custom *nonsensitive* configuration properties that are *not* labelled with "Type: password" under "Configuration Properties" section in the docs:
+  // https://docs.confluent.io/cloud/current/connectors/cc-mongo-db-sink.html#configuration-properties
+  config_nonsensitive = {
+    "connector.class"          = "MongoDbAtlasSink"
+    "name"                     = "confluent-mongodb-sink"
+    "kafka.auth.mode"          = "SERVICE_ACCOUNT"
+    "kafka.service.account.id" = confluent_service_account.mongodb-sink-connector.id
+    "connection.host"          = var.mongodb_host
+    "connection.user"          = var.mongodb_user
+    "input.data.format"        = "JSON_SR"
+    "topics"                   = "products_summarized_with_embeddings" // TODO replace with var?
+    "max.num.retries"          = "3"
+    "retries.defer.timeout"    = "5000"
+    "max.batch.size"           = "0"
+    "database"                 = var.mongodbatlas_database
+    "collection"               = var.mongodbatlas_collection
+    "tasks.max"                = "1"
+  }
+
+  depends_on = [
+    # also depends on the Flink scripts
+    confluent_kafka_acl.mongodb-sink-connector-create-on-dlq-lcc-topics,
+    confluent_kafka_acl.mongodb-sink-connector-create-on-error-lcc-topics,
+    confluent_kafka_acl.mongodb-sink-connector-create-on-success-lcc-topics,
+    confluent_kafka_acl.mongodb-sink-connector-describe-on-cluster,
+    confluent_kafka_acl.mongodb-sink-connector-write-on-dlq-lcc-topics,
+    confluent_kafka_acl.mongodb-sink-connector-write-on-error-lcc-topics,
+    confluent_kafka_acl.mongodb-sink-connector-write-on-success-lcc-topics,
+    confluent_kafka_acl.mongodb-sink-connector-read-on-connect-lcc-group,
+    confluent_kafka_acl.mongodb-sink-connector-read-on-target-topic,
+    confluent_flink_statement.insert-data,
+  ]
 }

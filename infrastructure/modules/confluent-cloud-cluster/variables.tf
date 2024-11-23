@@ -39,37 +39,24 @@ variable "confluent_cloud_environment" {
 }
 
 variable "mongodb_user" {
-  description = ""
+  description = "MongoDB Atlas connection user."
   type        = string
 }
 variable "mongodb_password" {
-  description = ""
+  description = "The MongoDB host. Use a hostname address and not a full URL. For example: cluster4-r5q3r7.gcp.mongodb.net. The hostname address must provide a service record (SRV). A standard connection string does not work."
   type        = string
 }
 variable "mongodb_host" {
-  description = ""
+  description = "The mongodb cluster host"
   type        = string
-}
-
-variable "mongodbatlas_public_key" {
-  description = "Public API key to authenticate to Atlas"
-  type        = string
-}
-
-variable "mongodbatlas_private_key" {
-  description = "Private API key to authenticate to Atlas"
-  type        = string
-  sensitive   = true
 }
 
 variable "mongodbatlas_database" {
-  description = "Atlas database"
+  description = "MongoDB Atlas database name"
   type        = string
-  default     = "genai"
 }
 
 variable "mongodbatlas_collection" {
-  description = "Atlas collection"
+  description = "Collection name to write to. If the connector is sinking data from multiple topics, this is the default collection the topics are mapped to."
   type        = string
-  default     = "all_insurance_products_embeddings"
 }

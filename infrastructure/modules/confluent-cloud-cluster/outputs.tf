@@ -5,7 +5,7 @@ output "clients_schema_registry_api_key" {
 }
 
 output "clients_kafka_api_key" {
-  value       = confluent_api_key.client_key
+  value       = confluent_api_key.client-key
   description = "API Key for Kafka client"
   sensitive   = true
 }
