@@ -13,3 +13,8 @@ output "connection_password" {
   sensitive   = true
   description = "database pwd provisioned"
 }
+
+output "project_id" {
+  value       = mongodbatlas_project.test.id
+  description = "MongoDB Atlas Project ID"
+}

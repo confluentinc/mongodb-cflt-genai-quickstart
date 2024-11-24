@@ -32,7 +32,7 @@ output "flink_rest_endpoint" {
 }
 
 output "flink_environment_id" {
-  value       = data.confluent_flink_compute_pool.main.environment[0].id
+  value       = confluent_flink_compute_pool.main.environment[0].id
   description = "Confluent Cloud Flink Environment ID"
 }
 

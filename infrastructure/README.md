@@ -33,12 +33,14 @@ terraform output resource-ids
 |------|---------|
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.76.0 |
 | <a name="requirement_confluent"></a> [confluent](#requirement\_confluent) | ~> 2.11.0 |
+| <a name="requirement_mongodbatlas"></a> [mongodbatlas](#requirement\_mongodbatlas) | 1.21.4 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_external"></a> [external](#provider\_external) | 2.3.4 |
+| <a name="provider_mongodbatlas"></a> [mongodbatlas](#provider\_mongodbatlas) | 1.21.4 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
 
 ## Modules
@@ -54,6 +56,7 @@ terraform output resource-ids
 
 | Name | Type |
 |------|------|
+| [mongodbatlas_search_index.search-vector](https://registry.terraform.io/providers/mongodb/mongodbatlas/1.21.4/docs/resources/search_index) | resource |
 | [random_id.env_display_id](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [external_external.system_architecture](https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/external) | data source |
 
@@ -68,14 +71,14 @@ terraform output resource-ids
 | <a name="input_confluent_cloud_region"></a> [confluent\_cloud\_region](#input\_confluent\_cloud\_region) | The region of Confluent Cloud Network | `string` | `"us-east-1"` | no |
 | <a name="input_confluent_cloud_service_provider"></a> [confluent\_cloud\_service\_provider](#input\_confluent\_cloud\_service\_provider) | The cloud provider of Confluent Cloud Network | `string` | `"AWS"` | no |
 | <a name="input_env_display_id_postfix"></a> [env\_display\_id\_postfix](#input\_env\_display\_id\_postfix) | A string that will be appended to different resources to make them unique. If not provided, a random string will be generated. | `string` | `null` | no |
-| <a name="input_mongodbatlas_cloud_provider"></a> [mongodbatlas\_cloud\_provider](#input\_mongodbatlas\_cloud\_provider) | Cloud provider | `string` | `"AWS"` | no |
-| <a name="input_mongodbatlas_cloud_region"></a> [mongodbatlas\_cloud\_region](#input\_mongodbatlas\_cloud\_region) | Cloud provider region name (note that MongoDB values are different than usual Cloud provider ones) | `string` | `"US_EAST_1"` | no |
+| <a name="input_mongodbatlas_cloud_provider"></a> [mongodbatlas\_cloud\_provider](#input\_mongodbatlas\_cloud\_provider) | The cloud provider of MongoDB Atlas | `string` | `"AWS"` | no |
+| <a name="input_mongodbatlas_cloud_region"></a> [mongodbatlas\_cloud\_region](#input\_mongodbatlas\_cloud\_region) | The region of MongoDB Atlas | `string` | `"US_EAST_1"` | no |
 | <a name="input_mongodbatlas_cluster"></a> [mongodbatlas\_cluster](#input\_mongodbatlas\_cluster) | Atlas cluster | `string` | `"genai"` | no |
 | <a name="input_mongodbatlas_collection"></a> [mongodbatlas\_collection](#input\_mongodbatlas\_collection) | Atlas collection | `string` | `"products_summarized_with_embeddings"` | no |
 | <a name="input_mongodbatlas_database"></a> [mongodbatlas\_database](#input\_mongodbatlas\_database) | Atlas database | `string` | `"genai"` | no |
 | <a name="input_mongodbatlas_org_id"></a> [mongodbatlas\_org\_id](#input\_mongodbatlas\_org\_id) | Organization ID | `string` | n/a | yes |
 | <a name="input_mongodbatlas_private_key"></a> [mongodbatlas\_private\_key](#input\_mongodbatlas\_private\_key) | Private API key to authenticate to Atlas | `string` | n/a | yes |
-| <a name="input_mongodbatlas_project"></a> [mongodbatlas\_project](#input\_mongodbatlas\_project) | Atlas project | `string` | `"Demo"` | no |
+| <a name="input_mongodbatlas_project"></a> [mongodbatlas\_project](#input\_mongodbatlas\_project) | Atlas project | `string` | `"GenAI-Quickstart"` | no |
 | <a name="input_mongodbatlas_public_key"></a> [mongodbatlas\_public\_key](#input\_mongodbatlas\_public\_key) | Public API key to authenticate to Atlas | `string` | n/a | yes |
 | <a name="input_path_to_flink_sql_create_model_statements"></a> [path\_to\_flink\_sql\_create\_model\_statements](#input\_path\_to\_flink\_sql\_create\_model\_statements) | The path to the SQL statements that will be used to create model in Flink | `string` | `null` | no |
 | <a name="input_path_to_flink_sql_create_table_statements"></a> [path\_to\_flink\_sql\_create\_table\_statements](#input\_path\_to\_flink\_sql\_create\_table\_statements) | The path to the SQL statements that will be used to create tables in Flink | `string` | `null` | no |

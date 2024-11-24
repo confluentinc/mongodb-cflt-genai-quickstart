@@ -57,8 +57,6 @@ No modules.
 | [confluent_service_account.mongodb-sink-connector](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [confluent_service_account.statements-runner](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/service_account) | resource |
 | [null_resource.create-flink-bedrock-connections](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [confluent_environment.staging](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/environment) | data source |
-| [confluent_flink_compute_pool.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/flink_compute_pool) | data source |
 | [confluent_flink_region.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/flink_region) | data source |
 | [confluent_organization.main](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/organization) | data source |
 | [confluent_schema_registry_cluster.essentials](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/data-sources/schema_registry_cluster) | data source |

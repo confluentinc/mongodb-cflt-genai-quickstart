@@ -1,3 +1,20 @@
+module "mongodb" {
+  source                      = "./modules/mongodb"
+  mongodbatlas_public_key     = var.mongodbatlas_public_key
+  mongodbatlas_private_key    = var.mongodbatlas_private_key
+  mongodbatlas_database       = var.mongodbatlas_database
+  mongodbatlas_collection     = var.mongodbatlas_collection
+  mongodbatlas_org_id         = var.mongodbatlas_org_id
+  mongodbatlas_cluster        = var.mongodbatlas_cluster
+  mongodbatlas_project        = var.mongodbatlas_project
+  mongodbatlas_cloud_provider = var.mongodbatlas_cloud_provider
+  mongodbatlas_cloud_region   = replace(upper(var.mongodbatlas_cloud_region), "-", "_")
+  providers = {
+    mongodbatlas = mongodbatlas
+  }
+}
+
+
 module "confluent_cloud_cluster" {
   source                           = "./modules/confluent-cloud-cluster"
   env_display_id_postfix           = local.env_display_id_postfix
@@ -21,15 +38,25 @@ module "confluent_cloud_cluster" {
   ]
 }
 
-module "mongodb" {
-  source                   = "./modules/mongodb"
-  mongodbatlas_public_key  = var.mongodbatlas_public_key
-  mongodbatlas_private_key = var.mongodbatlas_private_key
-  mongodbatlas_database    = var.mongodbatlas_database
-  mongodbatlas_collection  = var.mongodbatlas_collection
-  mongodbatlas_org_id      = var.mongodbatlas_org_id
+resource "mongodbatlas_search_index" "search-vector" {
+  name            = "${var.mongodbatlas_collection}-vector"
+  project_id      = module.mongodb.project_id
+  cluster_name    = var.mongodbatlas_cluster
+  collection_name = var.mongodbatlas_collection
+  database        = var.mongodbatlas_database
+  type            = "vectorSearch"
+  depends_on = [
+    module.confluent_cloud_cluster
+  ]
+  fields = <<-EOF
+[{
+      "type": "vector",
+      "path": "embeddings",
+      "numDimensions": 1024,
+      "similarity": "euclidean"
+}]
+EOF
 }
-
 
 module "backend" {
   source                 = "./modules/backend"

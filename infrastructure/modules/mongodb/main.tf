@@ -42,22 +42,3 @@ resource "mongodbatlas_project_ip_access_list" "ip" {
   comment    = "IP Address for accessing the cluster"
 }
 
-resource "mongodbatlas_search_index" "search-vector" {
-  name            = "${var.mongodbatlas_collection}-vector"
-  project_id      = mongodbatlas_project.test.id
-  cluster_name    = var.mongodbatlas_cluster
-  collection_name = var.mongodbatlas_collection
-  database        = var.mongodbatlas_database
-  type            = "vectorSearch"
-  depends_on = [
-    mongodbatlas_cluster.cluster
-  ]
-  fields = <<-EOF
-[{
-      "type": "vector",
-      "path": "embeddings",
-      "numDimensions": 1024,
-      "similarity": "euclidean"
-}]
-EOF
-}

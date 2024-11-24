@@ -16,10 +16,6 @@ resource "confluent_environment" "staging" {
   }
 }
 
-data "confluent_environment" "staging" {
-  id = confluent_environment.staging.id
-}
-
 # ------------------------------------------------------
 # KAFKA
 # ------------------------------------------------------
@@ -32,7 +28,7 @@ resource "confluent_kafka_cluster" "standard" {
   region       = var.confluent_cloud_region
   standard {}
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
 }
 
@@ -41,11 +37,10 @@ resource "confluent_kafka_cluster" "standard" {
 # ------------------------------------------------------
 data "confluent_schema_registry_cluster" "essentials" {
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
-
   depends_on = [
-    confluent_kafka_cluster.standard
+    confluent_kafka_cluster.standard,
   ]
 }
 
@@ -60,7 +55,7 @@ resource "confluent_flink_compute_pool" "main" {
   region       = var.confluent_cloud_region
   max_cfu      = 30
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
   depends_on = [
     confluent_role_binding.statements-runner-environment-admin,
@@ -75,20 +70,13 @@ data "confluent_flink_region" "main" {
   region = var.confluent_cloud_region
 }
 
-data "confluent_flink_compute_pool" "main" {
-  id = confluent_flink_compute_pool.main.id
-  environment {
-    id = data.confluent_environment.staging.id
-  }
-}
-
 resource "confluent_flink_statement" "create-tables" {
   for_each = var.create_table_sql_files
   organization {
     id = data.confluent_organization.main.id
   }
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
   compute_pool {
     id = confluent_flink_compute_pool.main.id
@@ -98,7 +86,7 @@ resource "confluent_flink_statement" "create-tables" {
   }
 
   properties = {
-    "sql.current-catalog"  = data.confluent_environment.staging.display_name
+    "sql.current-catalog"  = confluent_environment.staging.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name
   }
   rest_endpoint = data.confluent_flink_region.main.rest_endpoint
@@ -107,6 +95,9 @@ resource "confluent_flink_statement" "create-tables" {
     secret = confluent_api_key.app-manager-flink-api-key.secret
   }
   statement = file(abspath(each.value))
+  lifecycle {
+    ignore_changes = [rest_endpoint, organization[0].id]
+  }
 }
 
 # registers flink sql connections with bedrock. should be replaced when
@@ -117,7 +108,7 @@ resource "null_resource" "create-flink-bedrock-connections" {
     environment = {
       FLINK_API_KEY       = confluent_api_key.app-manager-flink-api-key.id
       FLINK_API_SECRET    = confluent_api_key.app-manager-flink-api-key.secret
-      FLINK_ENV_ID        = data.confluent_flink_compute_pool.main.environment[0].id
+      FLINK_ENV_ID        = confluent_flink_compute_pool.main.environment[0].id
       FLINK_ORG_ID        = data.confluent_organization.main.id
       FLINK_REST_ENDPOINT = data.confluent_flink_region.main.rest_endpoint
       # the rest should be set by deploy.sh
@@ -126,15 +117,10 @@ resource "null_resource" "create-flink-bedrock-connections" {
 
   triggers = {
     # changes to the flink sql cluster will trigger the bedrock connections to be created
-    flink_sql_cluster_id = data.confluent_flink_compute_pool.main.id
+    flink_sql_cluster_id = confluent_flink_compute_pool.main.id
     # change if the script changes
     script = filesha256("${path.module}/scripts/flink-connection-create.sh")
   }
-  depends_on = [
-    confluent_flink_compute_pool.main,
-    confluent_api_key.app-manager-flink-api-key,
-    confluent_role_binding.app-manager-flink-admin
-  ]
 }
 
 resource "confluent_flink_statement" "create-models" {
@@ -143,7 +129,7 @@ resource "confluent_flink_statement" "create-models" {
     id = data.confluent_organization.main.id
   }
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
   compute_pool {
     id = confluent_flink_compute_pool.main.id
@@ -153,7 +139,7 @@ resource "confluent_flink_statement" "create-models" {
   }
 
   properties = {
-    "sql.current-catalog"  = data.confluent_environment.staging.display_name
+    "sql.current-catalog"  = confluent_environment.staging.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name
   }
   rest_endpoint = data.confluent_flink_region.main.rest_endpoint
@@ -165,6 +151,9 @@ resource "confluent_flink_statement" "create-models" {
   depends_on = [
     null_resource.create-flink-bedrock-connections
   ]
+  lifecycle {
+    ignore_changes = [rest_endpoint, organization[0].id]
+  }
 }
 
 resource "confluent_flink_statement" "insert-data" {
@@ -173,7 +162,7 @@ resource "confluent_flink_statement" "insert-data" {
     id = data.confluent_organization.main.id
   }
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
   compute_pool {
     id = confluent_flink_compute_pool.main.id
@@ -183,7 +172,7 @@ resource "confluent_flink_statement" "insert-data" {
   }
 
   properties = {
-    "sql.current-catalog"  = data.confluent_environment.staging.display_name
+    "sql.current-catalog"  = confluent_environment.staging.display_name
     "sql.current-database" = confluent_kafka_cluster.standard.display_name
   }
   rest_endpoint = data.confluent_flink_region.main.rest_endpoint
@@ -197,9 +186,11 @@ resource "confluent_flink_statement" "insert-data" {
 
   depends_on = [
     confluent_flink_statement.create-tables,
-    confluent_flink_statement.create-models,
-    null_resource.create-flink-bedrock-connections
+    confluent_flink_statement.create-models
   ]
+  lifecycle {
+    ignore_changes = [rest_endpoint, organization[0].id]
+  }
 }
 
 
@@ -239,20 +230,20 @@ resource "confluent_service_account" "app-manager" {
 resource "confluent_role_binding" "statements-runner-environment-admin" {
   principal   = "User:${confluent_service_account.statements-runner.id}"
   role_name   = "EnvironmentAdmin"
-  crn_pattern = data.confluent_environment.staging.resource_name
+  crn_pattern = confluent_environment.staging.resource_name
 }
 
 // https://docs.confluent.io/cloud/current/access-management/access-control/rbac/predefined-rbac-roles.html#flinkdeveloper
 resource "confluent_role_binding" "app-manager-flink-developer" {
   principal   = "User:${confluent_service_account.app-manager.id}"
   role_name   = "FlinkDeveloper"
-  crn_pattern = data.confluent_environment.staging.resource_name
+  crn_pattern = confluent_environment.staging.resource_name
 }
 
 resource "confluent_role_binding" "app-manager-flink-admin" {
   principal   = "User:${confluent_service_account.app-manager.id}"
   role_name   = "FlinkAdmin"
-  crn_pattern = data.confluent_environment.staging.resource_name
+  crn_pattern = confluent_environment.staging.resource_name
 }
 
 // https://docs.confluent.io/cloud/current/access-management/access-control/rbac/predefined-rbac-roles.html#assigner
@@ -297,7 +288,7 @@ resource "confluent_api_key" "app-manager-flink-api-key" {
     api_version = data.confluent_flink_region.main.api_version
     kind        = data.confluent_flink_region.main.kind
     environment {
-      id = data.confluent_environment.staging.id
+      id = confluent_environment.staging.id
     }
   }
 }
@@ -315,7 +306,7 @@ resource "confluent_api_key" "client-key" {
     api_version = confluent_kafka_cluster.standard.api_version
     kind        = confluent_kafka_cluster.standard.kind
     environment {
-      id = data.confluent_environment.staging.id
+      id = confluent_environment.staging.id
     }
   }
 }
@@ -333,7 +324,7 @@ resource "confluent_api_key" "clients-schema-registry-api-key" {
     api_version = data.confluent_schema_registry_cluster.essentials.api_version
     kind        = data.confluent_schema_registry_cluster.essentials.kind
     environment {
-      id = data.confluent_environment.staging.id
+      id = confluent_environment.staging.id
     }
   }
 }
@@ -351,7 +342,7 @@ resource "confluent_api_key" "mongodb-sink-connector-key" {
     api_version = confluent_kafka_cluster.standard.api_version
     kind        = confluent_kafka_cluster.standard.kind
     environment {
-      id = data.confluent_environment.staging.id
+      id = confluent_environment.staging.id
     }
   }
 }
@@ -579,7 +570,7 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-connect-lcc-group
 
 resource "confluent_connector" "mongo-db-sink" {
   environment {
-    id = data.confluent_environment.staging.id
+    id = confluent_environment.staging.id
   }
   kafka_cluster {
     id = confluent_kafka_cluster.standard.id

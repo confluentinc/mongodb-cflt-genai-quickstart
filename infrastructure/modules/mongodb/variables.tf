@@ -17,35 +17,29 @@ variable "mongodbatlas_private_key" {
 variable "mongodbatlas_cloud_provider" {
   description = "Cloud provider"
   type        = string
-  default     = "AWS"
 }
 
 variable "mongodbatlas_cloud_region" {
   description = "Cloud provider region name (note that MongoDB values are different than usual Cloud provider ones)"
   type        = string
-  default     = "US_EAST_1"
 }
 
 variable "mongodbatlas_project" {
   description = "Atlas project"
   type        = string
-  default     = "GenAI-Quickstart"
 }
 
 variable "mongodbatlas_cluster" {
   description = "Atlas cluster"
   type        = string
-  default     = "genai"
 }
 
 variable "mongodbatlas_database" {
   description = "Atlas database"
   type        = string
-  default     = "genai"
 }
 
 variable "mongodbatlas_collection" {
   description = "Atlas collection"
   type        = string
-  default     = "products_summarized_with_embeddings"
 }

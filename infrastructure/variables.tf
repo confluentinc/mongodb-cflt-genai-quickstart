@@ -61,6 +61,18 @@ variable "path_to_flink_sql_insert_statements" {
   nullable    = true
 }
 
+variable "mongodbatlas_cloud_provider" {
+  description = "The cloud provider of MongoDB Atlas"
+  type        = string
+  default     = "AWS"
+}
+
+variable "mongodbatlas_cloud_region" {
+  description = "The region of MongoDB Atlas"
+  type        = string
+  default     = "US_EAST_1"
+}
+
 variable "mongodbatlas_org_id" {
   description = "Organization ID"
   type        = string
@@ -77,22 +89,10 @@ variable "mongodbatlas_private_key" {
   sensitive   = true
 }
 
-variable "mongodbatlas_cloud_provider" {
-  description = "Cloud provider"
-  type        = string
-  default     = "AWS"
-}
-
-variable "mongodbatlas_cloud_region" {
-  description = "Cloud provider region name (note that MongoDB values are different than usual Cloud provider ones)"
-  type        = string
-  default     = "US_EAST_1"
-}
-
 variable "mongodbatlas_project" {
   description = "Atlas project"
   type        = string
-  default     = "Demo"
+  default     = "GenAI-Quickstart"
 }
 
 variable "mongodbatlas_cluster" {
