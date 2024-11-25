@@ -1,5 +1,5 @@
 export interface ChatMessage {
-    role: "client" | "server";
-    userId: string;
-    data: string;
+  role: "client" | "server";
+  userId: string;
+  data: string;
 }
