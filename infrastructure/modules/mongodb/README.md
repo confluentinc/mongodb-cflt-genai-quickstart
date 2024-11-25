@@ -47,8 +47,11 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_cluster"></a> [cluster](#output\_cluster) | MongoDB Atlas Cluster |
+| <a name="output_collection"></a> [collection](#output\_collection) | MongoDB Atlas Collection |
 | <a name="output_connection_password"></a> [connection\_password](#output\_connection\_password) | database pwd provisioned |
 | <a name="output_connection_user"></a> [connection\_user](#output\_connection\_user) | database user provisioned |
+| <a name="output_database"></a> [database](#output\_database) | MongoDB Atlas Database |
 | <a name="output_host"></a> [host](#output\_host) | Cluster host address |
 | <a name="output_project_id"></a> [project\_id](#output\_project\_id) | MongoDB Atlas Project ID |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

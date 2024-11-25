@@ -37,7 +37,7 @@ output "flink_environment_id" {
 }
 
 output "frontend_url" {
-  value = module.frontend.frontend_url
+  value = "https://${module.frontend.frontend_url}"
 }
 
 output "websocket_endpoint" {

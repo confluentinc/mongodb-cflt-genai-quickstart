@@ -72,25 +72,29 @@ module "backend" {
     secret = module.confluent_cloud_cluster.clients_schema_registry_api_key.secret
   }
   system_architecture = local.system_architecture
-  depends_on = [
-    module.confluent_cloud_cluster
-  ]
+
+  connections_api_topics_info = var.connections_api_topics_info
+  vectorsearch_topics_info    = var.vectorsearch_topics_info
 
   mongodb_db_user = {
-    id     = "blah"
-    secret = "blah"
+    id     = module.mongodb.connection_user
+    secret = module.mongodb.connection_password
   }
 
   mongodb_vectorsearch_info = {
-    collection_name = "blah"
-    index_name      = "blah"
-    field_path      = "blah"
+    collection_name = module.mongodb.collection
+    index_name      = mongodbatlas_search_index.search-vector.name
+    field_path      = "embeddings"
   }
 
   mongodb_db_info = {
-    host    = "blah"
-    db_name = "blah"
+    host    = module.mongodb.host
+    db_name = module.mongodb.database
   }
+
+  depends_on = [
+    module.confluent_cloud_cluster
+  ]
 }
 
 module "frontend" {

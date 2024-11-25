@@ -68,7 +68,7 @@ export default function Chat() {
     return (
         <>
             <h1 className="text-3xl mb-6 font-bold text-center">
-                Friendly Neighbourhood Bank
+                Big Friendly Bank
             </h1>
             <div className="flex flex-col flex-grow w-full max-w-screen-lg rounded-lg h-96 overflow-y-auto">
                 <ChatMessages messages={messageHistory}/>

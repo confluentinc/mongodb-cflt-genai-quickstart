@@ -22,7 +22,7 @@ resource "confluent_environment" "staging" {
 
 # In Confluent Cloud, an environment is mapped to a Flink catalog, and a Kafka cluster is mapped to a Flink database.
 resource "confluent_kafka_cluster" "standard" {
-  display_name = "genai-demo-${var.env_display_id_postfix}"
+  display_name = "genai-quickstart-${var.env_display_id_postfix}"
   availability = "SINGLE_ZONE"
   cloud        = var.confluent_cloud_service_provider
   region       = var.confluent_cloud_region
@@ -50,7 +50,7 @@ data "confluent_schema_registry_cluster" "essentials" {
 
 # https://docs.confluent.io/cloud/current/flink/get-started/quick-start-cloud-console.html#step-1-create-a-af-compute-pool
 resource "confluent_flink_compute_pool" "main" {
-  display_name = "genai-demo-flink-compute-pool-${var.env_display_id_postfix}"
+  display_name = "genai-quickstart-flink-compute-pool-${var.env_display_id_postfix}"
   cloud        = var.confluent_cloud_service_provider
   region       = var.confluent_cloud_region
   max_cfu      = 30
@@ -421,6 +421,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-describe-on-cluster" {
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-target-topic" {
@@ -439,6 +442,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-target-topic" {
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-dlq-lcc-topics" {
@@ -457,6 +463,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-dlq-lcc-topics"
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-dlq-lcc-topics" {
@@ -475,6 +484,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-dlq-lcc-topics" 
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-success-lcc-topics" {
@@ -493,6 +505,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-success-lcc-top
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-success-lcc-topics" {
@@ -511,6 +526,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-success-lcc-topi
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-error-lcc-topics" {
@@ -529,6 +547,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-create-on-error-lcc-topic
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-error-lcc-topics" {
@@ -547,6 +568,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-write-on-error-lcc-topics
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-connect-lcc-group" {
@@ -565,6 +589,9 @@ resource "confluent_kafka_acl" "mongodb-sink-connector-read-on-connect-lcc-group
     key    = confluent_api_key.mongodb-sink-connector-key.id
     secret = confluent_api_key.mongodb-sink-connector-key.secret
   }
+  depends_on = [
+    confluent_role_binding.mongodb-sink-connector-cluster-admin
+  ]
 }
 
 

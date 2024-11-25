@@ -37,7 +37,7 @@ variable "env_display_id_postfix" {
 variable "confluent_cloud_environment_name" {
   description = "The name of the Confluent Cloud environment to create"
   type        = string
-  default     = "genai-demo"
+  default     = "genai-quickstart"
 }
 
 variable "path_to_flink_sql_create_table_statements" {
@@ -111,4 +111,26 @@ variable "mongodbatlas_collection" {
   description = "Atlas collection"
   type        = string
   default     = "products_summarized_with_embeddings"
+}
+
+variable "vectorsearch_topics_info" {
+  description = "The relevant kafka topics that the vectorsearch lambda function will connect to"
+  type = object({
+    input_topic  = string
+    output_topic = string
+  })
+  default = {
+    input_topic  = "chat_input_embeddings"
+    output_topic = "chat_input_with_products"
+  }
+}
+
+variable "connections_api_topics_info" {
+  description = "The relevant kafka topics that the connections API lambda function will interact with. `input_topic` is what the lambda function will consume from."
+  type = object({
+    input_topic = string
+  })
+  default = {
+    input_topic = "chat_output"
+  }
 }

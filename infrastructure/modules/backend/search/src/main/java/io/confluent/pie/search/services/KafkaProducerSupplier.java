@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS;
+
 /**
  * Supplier for creating a KafkaProducer.
  */
@@ -19,10 +21,9 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class KafkaProducerSupplier implements Supplier<Producer<SearchResultsKey, SearchResults>> {
 
-    private final KafkaProducerConfiguration configuration;
+    private KafkaProducerConfiguration configuration;
 
     public KafkaProducerSupplier() throws IOException {
-        this(new KafkaProducerConfiguration());
     }
 
     /**
@@ -33,6 +34,10 @@ public class KafkaProducerSupplier implements Supplier<Producer<SearchResultsKey
     @Override
     public Producer<SearchResultsKey, SearchResults> get() {
         try {
+            if (configuration == null) {
+                configuration = new KafkaProducerConfiguration();
+            }
+
             log.info("Creating Kafka producer");
 
             // Load the config
@@ -40,12 +45,15 @@ public class KafkaProducerSupplier implements Supplier<Producer<SearchResultsKey
                     configuration.getBrokerUrl(),
                     configuration.getCcCredentials(),
                     configuration.getSrURL(),
-                    configuration.getSrCredentials());
+                    configuration.getSrCredentials(),
+                    false);
 
-            //
             return new KafkaProducer<>(properties);
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            log.error("Error creating Kafka producer", e);
             throw new RuntimeException(e);
+        } finally {
+            log.info("Kafka producer created");
         }
     }
 }

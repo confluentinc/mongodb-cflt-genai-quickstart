@@ -10,6 +10,7 @@ import io.confluent.pie.search.models.SearchResultsSerializer;
 import java.io.IOException;
 import java.util.Properties;
 
+import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS;
 import static org.apache.kafka.clients.CommonClientConfigs.SECURITY_PROTOCOL_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
@@ -24,10 +25,11 @@ public class ConfigUtils {
     /**
      * Load the configuration
      *
-     * @param brokerUrl     Kafka broker URL
-     * @param credentials   Kafka credentials
-     * @param srUrl         Schema Registry URL
-     * @param srCredentials Schema Registry credentials
+     * @param brokerUrl      Kafka broker URL
+     * @param credentials    Kafka credentials
+     * @param srUrl          Schema Registry URL
+     * @param srCredentials  Schema Registry credentials
+     * @param registerSchema whether to register the schema
      * @return the configuration
      * @throws IOException if the configuration cannot be loaded
      */
@@ -35,7 +37,10 @@ public class ConfigUtils {
             String brokerUrl,
             Credentials credentials,
             String srUrl,
-            Credentials srCredentials) throws IOException {
+            Credentials srCredentials,
+            boolean registerSchema) throws IOException {
+
+        log.info("Loading configuration...");
 
         return new Properties() {{
             // User-specific properties that you must set
@@ -54,6 +59,7 @@ public class ConfigUtils {
             // SR
             put(KafkaJsonSchemaDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, srUrl);
             put(KafkaJsonSchemaDeserializerConfig.JSON_VALUE_TYPE, SearchRequest.class.getName());
+            put(AUTO_REGISTER_SCHEMAS, registerSchema);
 
             if (srCredentials != null) {
                 put(KafkaJsonSchemaDeserializerConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");

@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "frontend" {
-  bucket        = "genai-demo-frontend-${var.env_display_id_postfix}"
+  bucket        = "genai-quickstart-frontend-${var.env_display_id_postfix}"
   force_destroy = true
   lifecycle {
     prevent_destroy = false
@@ -55,8 +55,8 @@ resource "aws_s3_bucket_website_configuration" "frontend" {
 
 ## Create Origin Access Control as this is required to allow access to the s3 bucket without public access to the S3 bucket.
 resource "aws_cloudfront_origin_access_control" "frontend" {
-  name                              = "genai-demo-frontend-${var.env_display_id_postfix}"
-  description                       = "Origin Access Control for the genai-demo-frontend"
+  name                              = "genai-quickstart-frontend-${var.env_display_id_postfix}"
+  description                       = "Origin Access Control for the genai-quickstart-frontend"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"

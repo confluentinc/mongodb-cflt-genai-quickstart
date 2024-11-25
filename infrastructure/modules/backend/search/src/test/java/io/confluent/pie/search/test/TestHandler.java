@@ -61,7 +61,7 @@ public class TestHandler {
                                 kafka.getBootstrapServers(),
                                 null,
                                 "mock://",
-                                null));
+                                null, true));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

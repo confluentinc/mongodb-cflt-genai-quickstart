@@ -1,7 +1,5 @@
 # Account Setup
 
-This guide will help you set up the necessary accounts for the Quick Start Demo.
-
 ## Confluent Cloud
 
 
@@ -19,7 +17,7 @@ To set up a basic Kafka cluster, follow Section 1 in the [Quick Start for Conflu
 
 If you’re new to MongoDB Atlas, the [Create an Atlas Account](https://www.mongodb.com/docs/atlas/tutorial/create-atlas-account/) guide provides an overview of account setup options. To register directly, use this [registration link](https://www.mongodb.com/cloud/atlas/register/).
 
-For this demo, you’ll also need to [Deploy a Free Cluster](https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/#deploy-a-free-cluster).
+For this quickstart, you’ll also need to [Deploy a Free Cluster](https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/#deploy-a-free-cluster).
 
 To learn more, you can explore the [Get Started](https://www.mongodb.com/docs/atlas/getting-started/#get-started-with-atlas) documentation.
 

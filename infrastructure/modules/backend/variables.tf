@@ -73,10 +73,6 @@ variable "vectorsearch_topics_info" {
     input_topic  = string
     output_topic = string
   })
-  default = {
-    input_topic  = "chat_input"
-    output_topic = "chat_output"
-  }
 }
 
 variable "connections_api_topics_info" {
@@ -84,7 +80,4 @@ variable "connections_api_topics_info" {
   type = object({
     input_topic = string
   })
-  default = {
-    input_topic = "chat_output"
-  }
 }

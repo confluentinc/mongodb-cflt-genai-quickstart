@@ -60,6 +60,13 @@ if [ ! -d "./infrastructure/.terraform" ]; then
   docker compose run --rm terraform init || { echo "[-] Failed to initialize terraform"; exit 1; }
 fi
 
+# Support for already existing .env file
+DEFAULT_ENV_FILE=$1
+if [ -f "$DEFAULT_ENV_FILE" ]; then
+  echo "[+] Loading environment variables from $DEFAULT_ENV_FILE"
+  source "$DEFAULT_ENV_FILE"
+fi
+
 # Prompt for AWS credentials
 if [ -z "$AWS_ACCESS_KEY_ID" ]; then
   prompt_for_input AWS_ACCESS_KEY_ID "Enter your AWS_ACCESS_KEY_ID" false
@@ -71,11 +78,14 @@ fi
 
 # Prompt for AWS session token if needed
 if ! prompt_for_yes_no "Do you have an AWS_SESSION_TOKEN?"; then
-  prompt_for_input AWS_SESSION_TOKEN "Enter your AWS_SESSION_TOKEN" true
+  if [ -z "$AWS_SESSION_TOKEN" ]; then
+    prompt_for_input AWS_SESSION_TOKEN "Enter your AWS_SESSION_TOKEN" true
+  fi
 else
   # Unset AWS_SESSION_TOKEN if it was previously set
   unset AWS_SESSION_TOKEN
 fi
+
 
 # Default to us-east-1 if AWS_REGION is not set
 if [ -z "$AWS_REGION" ]; then

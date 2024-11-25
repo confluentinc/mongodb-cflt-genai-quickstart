@@ -91,7 +91,7 @@ module "websocket_chat_api_lambda_layer" {
 
   create_function          = false
   create_layer             = true
-  layer_name               = "GenAiDemoWebsocketChatApiLayer-${var.env_display_id_postfix}"
+  layer_name               = "GenAiQuickstartWebsocketChatApiLayer-${var.env_display_id_postfix}"
   compatible_runtimes      = ["python3.12"]
   runtime                  = "python3.12"
   compatible_architectures = [var.system_architecture]
@@ -107,12 +107,12 @@ module "websocket_chat_api_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 4.0"
 
-  function_name = "GenAiDemoWebsocketChatApi-${var.env_display_id_postfix}"
+  function_name = "GenAiQuickstartWebsocketChatApi-${var.env_display_id_postfix}"
 
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = 1
 
-  description   = "GenAi Demo Websocket Chat Api"
+  description   = "GenAi Quickstart Websocket Chat Api"
   handler       = "websocket_lambda.lambda_handler"
   runtime       = "python3.12"
   architectures = [var.system_architecture]
@@ -150,7 +150,7 @@ module "websocket_chat_api_lambda" {
 }
 
 # Required for the Lambda function to connect to the Kafka cluster
-resource "aws_secretsmanager_secret" "confluent_cloud_genai_demo" {
+resource "aws_secretsmanager_secret" "confluent_cloud_genai_quickstart" {
   name                    = "confluent/chatbot-api/creds/${var.env_display_id_postfix}"
   recovery_window_in_days = 0
 }
@@ -166,8 +166,8 @@ resource "aws_secretsmanager_secret" "mongodb" {
 }
 
 
-resource "aws_secretsmanager_secret_version" "confluent_cloud_genai_demo_version" {
-  secret_id = aws_secretsmanager_secret.confluent_cloud_genai_demo.id
+resource "aws_secretsmanager_secret_version" "confluent_cloud_genai_quickstart_version" {
+  secret_id = aws_secretsmanager_secret.confluent_cloud_genai_quickstart.id
   secret_string = jsonencode({
     "username" : var.kafka_api_key.id,
     "password" : var.kafka_api_key.secret
@@ -183,7 +183,7 @@ resource "aws_secretsmanager_secret_version" "confluent_cloud_schema_registry_ve
 }
 
 resource "aws_secretsmanager_secret_version" "mongodb_version" {
-  secret_id = aws_secretsmanager_secret.confluent_cloud_schema_registry.id
+  secret_id = aws_secretsmanager_secret.mongodb.id
   secret_string = jsonencode({
     "username" : var.mongodb_db_user.id,
     "password" : var.mongodb_db_user.secret
@@ -194,12 +194,12 @@ module "lambda_trigger_connections_api" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 4.0"
 
-  function_name = "GenAiDemoKafkaTriggerWebsocketConnectionsApi-${var.env_display_id_postfix}"
+  function_name = "GenAiQuickstartKafkaTriggerWebsocketConnectionsApi-${var.env_display_id_postfix}"
 
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = 1
 
-  description   = "GenAi Demo Kafka Trigger Websocket Connections Api"
+  description   = "GenAi Quickstart Kafka Trigger Websocket Connections Api"
   handler       = "kafkatrigger_lambda.lambda_handler"
   runtime       = "python3.12"
   architectures = [var.system_architecture]
@@ -237,13 +237,13 @@ module "lambda_trigger_connections_api" {
       ]
       self_managed_kafka_event_source_config = [
         {
-          consumer_group_id = "genai-demo-lambda-trigger-connections-api-${var.env_display_id_postfix}"
+          consumer_group_id = "genai-quickstart-lambda-trigger-connections-api-${var.env_display_id_postfix}"
         }
       ]
       source_access_configuration = [
         {
           type = "BASIC_AUTH",
-          uri  = aws_secretsmanager_secret.confluent_cloud_genai_demo.arn
+          uri  = aws_secretsmanager_secret.confluent_cloud_genai_quickstart.arn
         },
       ]
     }
@@ -253,7 +253,7 @@ module "lambda_trigger_connections_api" {
     secrets_manager_get_value = {
       effect    = "Allow",
       actions   = ["secretsmanager:GetSecretValue"],
-      resources = [aws_secretsmanager_secret.confluent_cloud_genai_demo.arn]
+      resources = [aws_secretsmanager_secret.confluent_cloud_genai_quickstart.arn]
     },
     manage_connections = {
       effect    = "Allow",
@@ -271,22 +271,22 @@ module "lambda_trigger_vector_search" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 4.0"
 
-  function_name = "GenAiDemoKafkaTriggerVectorSearch-${var.env_display_id_postfix}"
+  function_name = "GenAiQuickstartKafkaTriggerVectorSearch-${var.env_display_id_postfix}"
 
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = 1
 
-  description   = "GenAi Demo Kafka Trigger Vector Search"
+  description   = "GenAi Quickstart Kafka Trigger Vector Search"
   handler       = "io.confluent.pie.search.SearchHandler::handleRequest"
   runtime       = "java17"
   architectures = [var.system_architecture]
-  timeout       = 30
+  timeout       = 600
 
   environment_variables = {
     SR_URL    = var.schema_registry_url
     SR_SECRET = aws_secretsmanager_secret.confluent_cloud_schema_registry.name
     # Change this to be the path to the aws secret manager secret
-    KAFKA_SECRET_KEY      = aws_secretsmanager_secret.confluent_cloud_genai_demo.name
+    KAFKA_SECRET_KEY      = aws_secretsmanager_secret.confluent_cloud_genai_quickstart.name
     BROKER                = var.bootstrap_servers
     MONGO_CREDENTIALS     = aws_secretsmanager_secret.mongodb.name
     MONGO_HOST            = var.mongodb_db_info.host
@@ -328,13 +328,13 @@ module "lambda_trigger_vector_search" {
       ]
       self_managed_kafka_event_source_config = [
         {
-          consumer_group_id = "genai-demo-lambda-vector-search-${var.env_display_id_postfix}"
+          consumer_group_id = "genai-quickstart-lambda-vector-search-${var.env_display_id_postfix}"
         }
       ]
       source_access_configuration = [
         {
           type = "BASIC_AUTH",
-          uri  = aws_secretsmanager_secret.confluent_cloud_genai_demo.arn
+          uri  = aws_secretsmanager_secret.confluent_cloud_genai_quickstart.arn
         },
       ]
     }
@@ -345,7 +345,7 @@ module "lambda_trigger_vector_search" {
       effect  = "Allow",
       actions = ["secretsmanager:GetSecretValue"],
       resources = [
-        aws_secretsmanager_secret.confluent_cloud_genai_demo.arn,
+        aws_secretsmanager_secret.confluent_cloud_genai_quickstart.arn,
         aws_secretsmanager_secret.confluent_cloud_schema_registry.arn, aws_secretsmanager_secret.mongodb.arn
       ]
     }

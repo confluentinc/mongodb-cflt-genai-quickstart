@@ -67,9 +67,10 @@ terraform output resource-ids
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region to deploy the infrastructure | `string` | `"us-east-1"` | no |
 | <a name="input_confluent_cloud_api_key"></a> [confluent\_cloud\_api\_key](#input\_confluent\_cloud\_api\_key) | Confluent Cloud API Key (also referred as Cloud API ID) with EnvironmentAdmin and AccountAdmin roles provided by Kafka Ops team | `string` | n/a | yes |
 | <a name="input_confluent_cloud_api_secret"></a> [confluent\_cloud\_api\_secret](#input\_confluent\_cloud\_api\_secret) | Confluent Cloud API Secret | `string` | n/a | yes |
-| <a name="input_confluent_cloud_environment_name"></a> [confluent\_cloud\_environment\_name](#input\_confluent\_cloud\_environment\_name) | The name of the Confluent Cloud environment to create | `string` | `"genai-demo"` | no |
+| <a name="input_confluent_cloud_environment_name"></a> [confluent\_cloud\_environment\_name](#input\_confluent\_cloud\_environment\_name) | The name of the Confluent Cloud environment to create | `string` | `"genai-quickstart"` | no |
 | <a name="input_confluent_cloud_region"></a> [confluent\_cloud\_region](#input\_confluent\_cloud\_region) | The region of Confluent Cloud Network | `string` | `"us-east-1"` | no |
 | <a name="input_confluent_cloud_service_provider"></a> [confluent\_cloud\_service\_provider](#input\_confluent\_cloud\_service\_provider) | The cloud provider of Confluent Cloud Network | `string` | `"AWS"` | no |
+| <a name="input_connections_api_topics_info"></a> [connections\_api\_topics\_info](#input\_connections\_api\_topics\_info) | The relevant kafka topics that the connections API lambda function will interact with. `input_topic` is what the lambda function will consume from. | <pre>object({<br/>    input_topic = string<br/>  })</pre> | <pre>{<br/>  "input_topic": "chat_output"<br/>}</pre> | no |
 | <a name="input_env_display_id_postfix"></a> [env\_display\_id\_postfix](#input\_env\_display\_id\_postfix) | A string that will be appended to different resources to make them unique. If not provided, a random string will be generated. | `string` | `null` | no |
 | <a name="input_mongodbatlas_cloud_provider"></a> [mongodbatlas\_cloud\_provider](#input\_mongodbatlas\_cloud\_provider) | The cloud provider of MongoDB Atlas | `string` | `"AWS"` | no |
 | <a name="input_mongodbatlas_cloud_region"></a> [mongodbatlas\_cloud\_region](#input\_mongodbatlas\_cloud\_region) | The region of MongoDB Atlas | `string` | `"US_EAST_1"` | no |
@@ -83,6 +84,7 @@ terraform output resource-ids
 | <a name="input_path_to_flink_sql_create_model_statements"></a> [path\_to\_flink\_sql\_create\_model\_statements](#input\_path\_to\_flink\_sql\_create\_model\_statements) | The path to the SQL statements that will be used to create model in Flink | `string` | `null` | no |
 | <a name="input_path_to_flink_sql_create_table_statements"></a> [path\_to\_flink\_sql\_create\_table\_statements](#input\_path\_to\_flink\_sql\_create\_table\_statements) | The path to the SQL statements that will be used to create tables in Flink | `string` | `null` | no |
 | <a name="input_path_to_flink_sql_insert_statements"></a> [path\_to\_flink\_sql\_insert\_statements](#input\_path\_to\_flink\_sql\_insert\_statements) | The path to the SQL statements that will be used to insert data in Flink | `string` | `null` | no |
+| <a name="input_vectorsearch_topics_info"></a> [vectorsearch\_topics\_info](#input\_vectorsearch\_topics\_info) | The relevant kafka topics that the vectorsearch lambda function will connect to | <pre>object({<br/>    input_topic  = string<br/>    output_topic = string<br/>  })</pre> | <pre>{<br/>  "input_topic": "chat_input_embeddings",<br/>  "output_topic": "chat_input_with_products"<br/>}</pre> | no |
 
 ## Outputs
 

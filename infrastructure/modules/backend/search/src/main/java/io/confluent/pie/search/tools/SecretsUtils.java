@@ -30,10 +30,11 @@ public class SecretsUtils {
             return null;
         }
 
-        log.info("Getting secret value for secret: {}", secretName);
+        final String urlEncodedSecretName = secretName.replace("/", "%2F");
+        log.info("Getting secret value for secret: {}", urlEncodedSecretName);
 
         final String secrets_extension_http_port = System.getenv("PARAMETERS_SECRETS_EXTENSION_HTTP_PORT");
-        final String secretURL = "http://localhost:" + ((secrets_extension_http_port == null) ? "2773" : secrets_extension_http_port) + "/secretsmanager/get?secretId=" + secretName;
+        final String secretURL = "http://localhost:" + ((secrets_extension_http_port == null) ? "2773" : secrets_extension_http_port) + "/secretsmanager/get?secretId=" + urlEncodedSecretName;
 
         log.info("Secret URL: {}", secretURL);
 

@@ -16,11 +16,13 @@ import io.confluent.pie.search.tools.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 
@@ -75,10 +77,12 @@ public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> 
      */
     @Override
     public Boolean handleRequest(LambdaKafkaEvent searchRecord, Context context) {
-        log.info("Received search request: {}", searchRecord.eventSource());
+        log.info("Received search request: {} from {}", searchRecord.eventSource(), searchRecord.bootstrapServers());
 
         // Deserialize all the search request
         final List<SearchRequest> searchRequests = getAllSearchRequest(searchRecord);
+
+        log.info("Processing {} search requests", searchRequests.size());
 
         searchRequests
                 .stream()
@@ -90,8 +94,27 @@ public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> 
                         new SearchResultsKey(products),
                         new SearchResults(products)))
                 .forEach(record -> {
+                    log.info("Sending search results to topic: {}", searchResultTopicName);
+
                     // Send the record
-                    lazyProducer.get().send(record);
+                    try {
+                        final RecordMetadata recordMetadata = lazyProducer
+                                .get()
+                                .send(record, (metadata, exception) -> {
+                                    if (exception != null) {
+                                        log.error("Error sending search results", exception);
+                                        throw new RuntimeException(exception);
+                                    } else {
+                                        log.info("Search results sent to topic: {}", searchResultTopicName);
+                                    }
+                                })
+                                .get();
+
+                        log.info("Record sent to partition: {}, offset: {}", recordMetadata.partition(), recordMetadata.offset());
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error("Error sending search results.", e);
+                        throw new RuntimeException(e);
+                    }
                 });
 
         lazyProducer.get().flush();
@@ -112,6 +135,8 @@ public class SearchHandler implements RequestHandler<LambdaKafkaEvent, Boolean> 
             records.forEach(record -> {
                 final byte[] value = Base64.getDecoder().decode(record.value());
                 final SearchRequest request = searchRequestDeserializer.get().deserialize(value);
+
+                log.info("Deserialized search request: {}", request.requestId());
 
                 requests.add(request);
             });

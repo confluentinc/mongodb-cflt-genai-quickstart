@@ -99,6 +99,8 @@ public class MongoService implements Closeable, DBService {
             products.add(document);
         });
 
+        log.info("Found {} products", products.size());
+
         return products;
     }
 }

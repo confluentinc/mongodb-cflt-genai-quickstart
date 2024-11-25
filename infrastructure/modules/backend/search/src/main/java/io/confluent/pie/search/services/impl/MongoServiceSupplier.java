@@ -14,10 +14,9 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class MongoServiceSupplier implements Supplier<DBService> {
 
-    private final MongoServiceConfiguration configuration;
+    private MongoServiceConfiguration configuration;
 
     public MongoServiceSupplier() throws IOException {
-        this(new MongoServiceConfiguration());
     }
     
     /**
@@ -28,6 +27,10 @@ public class MongoServiceSupplier implements Supplier<DBService> {
     @Override
     public MongoService get() {
         try {
+            if (configuration == null) {
+                configuration = new MongoServiceConfiguration();
+            }
+
             return new MongoService(
                     configuration.getCredentials(),
                     configuration.getHost(),

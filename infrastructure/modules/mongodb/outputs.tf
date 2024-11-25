@@ -18,3 +18,18 @@ output "project_id" {
   value       = mongodbatlas_project.test.id
   description = "MongoDB Atlas Project ID"
 }
+
+output "collection" {
+  value       = var.mongodbatlas_collection
+  description = "MongoDB Atlas Collection"
+}
+
+output "database" {
+  value       = var.mongodbatlas_database
+  description = "MongoDB Atlas Database"
+}
+
+output "cluster" {
+  value       = var.mongodbatlas_cluster
+  description = "MongoDB Atlas Cluster"
+}

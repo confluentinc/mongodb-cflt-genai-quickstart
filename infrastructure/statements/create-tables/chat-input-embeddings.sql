@@ -5,7 +5,7 @@ CREATE TABLE chat_input_embeddings
     numberOfCandidate INT,
     `limit`             INT,
     minScore DOUBLE,
-    metadata          ROW(`input` STRING, `userid` STRING, `messageId` STRING)
+    metadata          ROW(`input` STRING, `userId` STRING, `messageId` STRING)
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH
         (
