@@ -56,8 +56,16 @@ fi
 
 # Check if terraform is initialized
 if [ ! -d "./infrastructure/.terraform" ]; then
+  touch .env
   echo "[+] Initializing terraform"
-  docker compose run --rm terraform init || { echo "[-] Failed to initialize terraform"; exit 1; }
+  IMAGE_ARCH=$IMAGE_ARCH  docker compose run --rm terraform init || { echo "[-] Failed to initialize terraform"; exit 1; }
+fi
+
+# Support for already existing .env file
+DEFAULT_ENV_FILE=$1
+if [ -f "$DEFAULT_ENV_FILE" ]; then
+  echo "[+] Loading environment variables from $DEFAULT_ENV_FILE"
+  source "$DEFAULT_ENV_FILE"
 fi
 
 # Support for already existing .env file
@@ -149,7 +157,7 @@ mongodbatlas_org_id = "$MONGODB_ORG_ID"
 EOF
 
 echo "[+] Applying terraform"
-docker compose run --remove-orphans --rm terraform apply --auto-approve -var-file=variables.tfvars
+IMAGE_ARCH=$IMAGE_ARCH docker compose run --remove-orphans --rm terraform apply --auto-approve -var-file=variables.tfvars
 if [ $? -ne 0 ]; then
   echo "[-] Failed to apply terraform"
   exit 1

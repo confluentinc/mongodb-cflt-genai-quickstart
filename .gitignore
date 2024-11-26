@@ -133,6 +133,7 @@ cython_debug/
 # PyCharm
 
 .idea/.gitignore
+.idea/dbx-genai-aws-demo.iml
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
@@ -143,3 +144,4 @@ cython_debug/
 builds/
 
 .env*
+.terraform.lock.hcl
