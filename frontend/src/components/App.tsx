@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Chat from "./Chat";
-import Login from "./Login";
+import CustomerCards from "./CustomerCards";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,7 +14,7 @@ export default function App() {
   return (
     <>
       {!isLoggedIn ? (
-        <Login onLogin={handleLogin} />
+        <CustomerCards onLogin={handleLogin} />
       ) : (
         <Chat username={username} />
       )}

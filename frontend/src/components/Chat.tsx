@@ -79,15 +79,15 @@ export default function Chat({ username }: { username: string }) {
   };
 
   return (
-    <div>
+    <div className="relative">
       <button
-        className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg"
+        className="fixed bottom-20 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg"
         onClick={toggleChat}
       >
         Chat
       </button>
       {isChatOpen && (
-        <div className="fixed bottom-16 right-4 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col w-1/3">
+        <div className="fixed bottom-32 right-4 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col w-1/3">
           <div className="flex justify-between items-center p-4 bg-blue-500 rounded-t-lg">
             <h1 className="text-xl font-bold">Big Friendly Bank</h1>
             <button onClick={toggleChat} className="text-white">
