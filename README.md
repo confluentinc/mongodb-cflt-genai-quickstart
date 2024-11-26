@@ -70,7 +70,35 @@ At last, get your Atlas Organization ID from the Atlas UI.
 
 ## Architecture
 
-The architecture of this project integrates Confluent Cloud, MongoDb Atlas and Flink to deliver a scalable, real-time GenAI-powered chatbot. Confluent Cloud serves as the backbone for real-time data streaming, while Flink processes and orchestrates interactions with AI models, enabling intelligent and responsive user experiences. This modular design ensures flexibility, maintainability, and seamless integration with supporting cloud infrastructure.
+Architecture for handling document indexing and chatbot functionality using a combination of AWS services, Anthropic Claude, MongoDB Atlas and Confluent Cloud. Below is a breakdown of the architecture and its components:
 
-<img src="quickstart_architecture.png" width="400" />
+**Document Indexing**
+
+This section focuses on ingesting and processing data for use in downstream applications like search and chatbots.
+
+1.  **Data Sources:** Various data sources feed into the system. These could be structured or unstructured data streams.
+2.  **Summarization:** Anthropic Claude is used to summarize data to extract meaningful information from documents.
+3.  **Vectorization:** Embeddings are generated for the input data to convert textual information into high-dimensional numerical vectors.
+4.  **Sink Connector:** Processed data (both summarized content and embeddings) is output via a sink connector to MongoDB Atlas vector database.
+
+**Chatbot**
+
+This section demonstrates how the system interacts with user queries in real time.
+
+1.  **Frontend:** The frontend handles interactions with users. User inputs are sent to a topic for further processing.
+2.  **Websocket:** Provides real-time communication between the frontend and backend for immediate responses.
+3.  **Query Vectorization:** User queries are vectorized using the Embeddings model to transform them into numerical representations. This is done to match queries against stored vectors in the vector search database.
+4.  **Vector Search:** MongoDB Atlas vector database, retrieves relevant information based on the vectorized query. It searches through embeddings generated during the document indexing phase.
+5.  **Model Inference:** Anthropic Claude is used for model inference to generate responses.
+6.  **Output to User:** The system sends the processed results back to the user via the websocket.
+
+**Key Concepts:**
+
+• **Embeddings:** These are vector representations of text, allowing the system to handle semantic search.
+
+• **MongoDB Atlas:** Enables efficient, scalable, and real-time semantic matching of user queries against high-dimensional embeddings to deliver relevant results in the chatbot and document indexing workflows.
+
+• **Anthropic Claude:** Used for both summarization and generating responses in natural language.
+
+<p align="center"> <img src="quickstart_architecture.png" width="600" alt="Quickstart Architecture" /> </p>
 
