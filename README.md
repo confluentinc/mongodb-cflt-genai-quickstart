@@ -67,3 +67,10 @@ At last, get your Atlas Organization ID from the Atlas UI.
         ├── create-tables
         └── insert
 ```
+
+## Architecture
+
+The architecture of this project integrates Confluent Cloud, MongoDb Atlas and Flink to deliver a scalable, real-time GenAI-powered chatbot. Confluent Cloud serves as the backbone for real-time data streaming, while Flink processes and orchestrates interactions with AI models, enabling intelligent and responsive user experiences. This modular design ensures flexibility, maintainability, and seamless integration with supporting cloud infrastructure.
+
+<img src="quickstart_architecture.png" width="400" />
+
