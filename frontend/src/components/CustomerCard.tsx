@@ -81,9 +81,7 @@ function CustomerCard({
   return (
     <div className="relative min-h-96 w-full md:w-1/4 flex flex-col justify-center items-center my-4 mx-2 bg-white shadow-lg border border-slate-200 rounded-lg p-4">
       <div className="p-3 text-center space-y-4">
-        <div className="flex justify-center">
-          {renderIcon()}
-        </div>
+        <div className="flex justify-center">{renderIcon()}</div>
         <div className="flex justify-center">
           <h5 className="text-slate-800 text-2xl font-semibold">{title}</h5>
         </div>

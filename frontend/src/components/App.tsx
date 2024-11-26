@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Chat from "./Chat";
 import CustomerCards from "./CustomerCards";
+import Dashboard from "./Dashboard"; // Import the new Dashboard component
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,7 +16,7 @@ export default function App() {
       {!isLoggedIn ? (
         <CustomerCards onLogin={handleLogin} />
       ) : (
-        <Chat username={username} />
+        <Dashboard username={username} />
       )}
     </>
   );

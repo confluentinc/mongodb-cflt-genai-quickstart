@@ -281,6 +281,7 @@ module "lambda_trigger_vector_search" {
   runtime       = "java17"
   architectures = [var.system_architecture]
   timeout       = 600
+  snap_start    = true
 
   environment_variables = {
     SR_URL    = var.schema_registry_url

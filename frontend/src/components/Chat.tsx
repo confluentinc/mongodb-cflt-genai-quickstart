@@ -6,6 +6,7 @@ import ChatMessages from "./ChatMessages.tsx";
 import type { ChatMessage } from "./ChatMessage.tsx";
 import type { ClientMessage } from "./ClientMessage.tsx";
 import type { WebSocketServerMessage } from "./WebSocketServerMessage.tsx";
+import { LiaCommentsDollarSolid } from "react-icons/lia"; // Re-add this import for the chat icon
 
 /**
  * Chat component that handles user input and displays chat messages.
@@ -81,10 +82,10 @@ export default function Chat({ username }: { username: string }) {
   return (
     <div className="relative">
       <button
-        className="fixed bottom-20 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg"
+        className="fixed bottom-20 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg flex items-center justify-center w-12 h-12"
         onClick={toggleChat}
       >
-        Chat
+        <LiaCommentsDollarSolid size={40} /> {/* Use the chat icon */}
       </button>
       {isChatOpen && (
         <div className="fixed bottom-32 right-4 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col w-1/3">
