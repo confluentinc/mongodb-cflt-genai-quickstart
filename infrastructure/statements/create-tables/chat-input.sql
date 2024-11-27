@@ -4,7 +4,8 @@ CREATE TABLE
     sessionId STRING PRIMARY KEY NOT ENFORCED,
     userId    STRING,
     messageId STRING,
-    `input`     STRING,
+    `input`   STRING,
+    history   STRING,
     createdAt TIMESTAMP_LTZ(3)
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH

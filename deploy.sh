@@ -156,12 +156,17 @@ mongodbatlas_private_key = "$MONGODB_PRIVATE_KEY"
 mongodbatlas_org_id = "$MONGODB_ORG_ID"
 EOF
 
+echo "RUNNING" >> .status
+
 echo "[+] Applying terraform"
 IMAGE_ARCH=$IMAGE_ARCH docker compose run --remove-orphans --rm terraform apply --auto-approve -var-file=variables.tfvars
 if [ $? -ne 0 ]; then
   echo "[-] Failed to apply terraform"
   exit 1
 fi
+
+rm .status
+
 echo "[+] Terraform apply complete"
 
 echo "[+] Done"

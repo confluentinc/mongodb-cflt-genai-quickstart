@@ -19,7 +19,7 @@ CREATE TABLE chat_input_with_products
     `updatedAt`           STRING,
     `ref_link`            STRING > >,
     product_summaries     STRING,
-    metadata              ROW(`input` STRING, `userId` STRING, `messageId` STRING)
+    metadata              ROW(`input` STRING, `userId` STRING, `messageId` STRING, `history` STRING)
 ) DISTRIBUTED INTO 1 BUCKETS
     WITH
         (
