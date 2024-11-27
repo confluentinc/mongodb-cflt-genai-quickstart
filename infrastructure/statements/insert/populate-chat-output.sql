@@ -10,7 +10,7 @@ FROM
         ML_PREDICT (
             'ColinAiChatAssistant',
             (
-                'Big Friendly Bank offers these financial products:\n' || `product_summaries` || '\nThe human name is ' || `metadata`.`userId` || '\nCurrent conversation:\n' || `metadata`.`input`
+                'Big Friendly Bank offers these financial products:\n' || `product_summaries` || '\nThe human name is ' || `metadata`.`userId` || '\nCurrent user-assistant conversation:<start>' || `metadata`.`input` || '<end>\nYour reply:'
             )
         )
     );
