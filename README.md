@@ -1,13 +1,26 @@
 # GenAI Chatbot Quickstart
 
-This quickstart showcases how to use Confluent Cloud with Flink to build a chatbot powered by GenAI. Confluent Cloud enables
-real-time data freshness and scalability for the chatbot.
+Welcome to the Small Business Loan Agent Chatbot Quick Start! This repository provides a comprehensive guide to quickly deploy a fully functional chatbot for small business loan assistance. The solution leverages **MongoDB**, **Confluent Cloud**, **AWS**, **Anthropic** and **Flink** to deliver a scalable, intelligent, and real-time conversational experience.
 
-With Apache Kafka and the [Kora](https://www.confluent.io/kora-cloud-native-apache-kafka-engine/) engine as its foundation, Confluent Cloud
-orchestrates the flow of information between various components of the chatbot.
+This quick start is designed to help businesses streamline their loan application process by providing a chatbot that understands and answers customer queries, retrieves relevant loan documents, and provides actionable insights. The system also includes structured document indexing into MongoDB's vector database, enabling efficient retrieval-augmented generation (RAG) to enhance the chatbot's response accuracy.
 
-Flink processes the data in real-time, connects with AI models
-and provides the chatbot with the necessary information to respond to user queries.
+**Key Features**
+
+* **Real-Time Data Processing**: Powered by Confluent Cloud and Flink, ensuring low-latency communication and event-driven architecture.
+* **Intelligent Conversations**: Integrated with Anthropic's AI models for natural and accurate conversational responses.
+* **Efficient Document Retrieval**: Leverages MongoDB Atlas with vector search capabilities for quick and accurate document indexing and retrieval.
+* **Scalable and Cloud-Native**: Built with AWS Lambda for a flexible and serverless REST API.
+* **Seamless Deployment**: Follow step-by-step instructions to deploy the entire solution with minimal effort.
+
+**Use Case**
+
+This chatbot is tailored for small business loan agents to:
+
+* Provide instant responses to loan-related queries.
+* Retrieve structured documents and relevant loan information in real-time.
+* Automate repetitive tasks, enabling agents to focus on high-value interactions.
+
+Whether you're exploring new ways to enhance customer engagement or testing generative AI use cases in financial services, this quick start provides the perfect foundation.
 
 ## Table of Contents
 
