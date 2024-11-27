@@ -21,9 +21,48 @@ Follow the [Get Docker](https://docs.docker.com/get-docker/) instructions to ins
 
 Once you have `docker` installed, you just need to get keys to authenticate to the various CSPs.  
 
-- [ ] [Confluent Cloud API Keys](https://www.confluent.io/blog/confluent-terraform-provider-intro/#api-key)
-- [ ] MongoDB Atlas API key: follow [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) or  [MongoDB Atlas API Keys](https://www.mongodb.com/developer/products/atlas/mongodb-atlas-with-terraform/) (part of a tutorial on Terraform with Atlas)
-- [ ] [AWS API Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html)
+#### Confluent Cloud
+
+For Confluent Cloud, you need to get a *Cloud resource management* key. 
+
+If you don't already have an account, after signing up, click the top right corner menu (AKA the hamburger menu) and select *API keys*.
+
+<img src="cc-api-keys.png" width="300" />
+
+Click the *+ Add API key* button, select *My Account* and click the *Next* button (bottom right).
+If you feel like it, enter a name and description. Click the *Create API Key* (bottom right).
+
+#### MongoDB Atlas
+
+1. Connect to the Atlas UI. You must have Organization Owner access to Atlas.
+2. Select *Organization Access* from the *Access Manager* menu in the navigation bar.
+3. Click *Access Manager* in the sidebar. (The Organization Access Manager page displays.)
+4. Click *Add new* then *API Key*
+5. In the *API Key Information*, enter a description.
+6. In the *Organization Permissions* menu, select the *Organization Owner* role. **Important:** Make sure that only the *Organization Owner* role is selected, you may have to click the default *Organization Member* to un-select it.
+7. Click *Next*, copy the public and private key in a safe place and click *Done*.
+
+Useful links:
+- [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) 
+- [MongoDB Atlas API Keys](https://www.mongodb.com/developer/products/atlas/mongodb-atlas-with-terraform/) (part of a tutorial on Terraform with Atlas)
+
+#### AWS
+
+AWS has many security credential types and authentication methods. No matter the one that you wish to use, or that your organization mandates, you'll get a key and secret that will have IAM rights (or policies) attached to it.
+
+The AWS credentials that we need in this step are going to be used by Flink AI to connect to Bedrock.
+
+You can attach on of these policies to your IAM identities:
+
+- AmazonBedrockFullAccess or AmazonBedrockStudioPermissionsBoundary
+- AWSLambdaRole or AWSLambda_FullAccess
+
+Useful links:
+- [AWS API Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html)
+- [Bedrock policies](https://docs.aws.amazon.com/bedrock/latest/userguide/security-iam-awsmanpol.html)
+- [Lambda policies](https://docs.aws.amazon.com/lambda/latest/dg/permissions-user-function.html)
+- [Flink AI: Create Model](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#create-an-ai-model)
+- [Bedrock from Flink AI](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#aws-bedrock)
 
 At the end of these steps, you should have:
 - A *key* and a *secret* for Confluent Cloud
