@@ -90,7 +90,7 @@ Once you have `docker` installed, you just need to get keys to authenticate to t
 
 #### Confluent Cloud
 
-![Creating Confluent Cloud Api Keys](./assets/cc-api-keys.mov)
+![Creating Confluent Cloud Api Keys](./assets/cc-api-keys.gif)
 
 For Confluent Cloud, you need to get a *Cloud resource management* key.
 
@@ -103,7 +103,7 @@ If you feel like it, enter a name and description. Click the *Create API Key* (b
 
 #### MongoDB Atlas
 
-![mongodb-atlas-api-keys](./assets/mongodb-create-api-key.mov)
+![mongodb-atlas-api-keys](./assets/mongodb-create-api-key.gif)
 
 1. Connect to the Atlas UI. You must have Organization Owner access to Atlas.
 2. Select *Organization Access* from the *Access Manager* menu in the navigation bar.
@@ -119,13 +119,17 @@ Useful links:
 - [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization)
 - [MongoDB Atlas API Keys](https://www.mongodb.com/developer/products/atlas/mongodb-atlas-with-terraform/) (part of a tutorial on Terraform with Atlas)
 
+At last, get your Atlas Organization ID from the Atlas UI.
+
+![Atlas Organization ID](./assets/atlas-org-id.png)
+
 #### AWS
 
 ##### Enable Foundation Model Access
 
 As part of the Quickstart, we use `amazon.titan-embed-text-v2:0` and `anthropic.claude-3-haiku-20240307-v1:0` models. You'll need to navigate through the AWS Console to enable access to these models.
 
-![Enable Foundation Model Access](./assets/aws-enable-foundation-models.mov)
+![Enable Foundation Model Access](./assets/aws-enable-foundation-models.gif)
 
 AWS has many security credential types and authentication methods. No matter the one that you wish to use, or that your organization mandates, you'll get a key and secret that will have IAM rights (or policies) attached to it.
 
@@ -143,16 +147,6 @@ Useful links:
 - [Lambda policies](https://docs.aws.amazon.com/lambda/latest/dg/permissions-user-function.html)
 - [Flink AI: Create Model](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#create-an-ai-model)
 - [Bedrock from Flink AI](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#aws-bedrock)
-
-At the end of these steps, you should have:
-
-- A *key* and a *secret* for Confluent Cloud
-- A *public key* and a *private key* for MongoDB Atlas
-- A *key*, a *secret* and a *token* for AWS.
-
-At last, get your Atlas Organization ID from the Atlas UI.
-
-![Atlas Organization ID](./assets/atlas-org-id.png)
 
 ## Run the Quickstart
 
