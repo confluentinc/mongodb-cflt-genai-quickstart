@@ -11,6 +11,11 @@ if ! [ -x "$(command -v docker)" ]; then
   exit 1
 fi
 
+if ! docker info > /dev/null 2>&1; then
+  echo 'Error: Docker is not running.' >&2
+  exit 1
+fi
+
 # destroy infrastructure
 # Check if terraform is initialized
 if [ ! -d "./infrastructure/.terraform" ]; then
