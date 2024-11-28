@@ -252,7 +252,7 @@ export default function Dashboard({ username }: { username: string }) {
                       </div>
                       <div className="flex flex-col items-start">
                         <dt className="font-semibold text-gray-800">Date:</dt>
-                        <dd className="text-sm text-gray-700">28 Oct. 21</dd>
+                        <dd className="text-sm text-gray-700">28 Oct. 2024</dd>
                       </div>
                     </dl>
                   </div>
@@ -279,7 +279,7 @@ export default function Dashboard({ username }: { username: string }) {
                       </div>
                       <div className="flex flex-col items-start">
                         <dt className="font-semibold text-gray-800">Date:</dt>
-                        <dd className="text-sm text-gray-700">26 Oct. 21</dd>
+                        <dd className="text-sm text-gray-700">26 Oct. 2024</dd>
                       </div>
                     </dl>
                   </div>
@@ -303,7 +303,7 @@ export default function Dashboard({ username }: { username: string }) {
                       </div>
                       <div className="flex flex-col items-start">
                         <dt className="font-semibold text-gray-800">Date:</dt>
-                        <dd className="text-sm text-gray-700">22 Oct. 21</dd>
+                        <dd className="text-sm text-gray-700">22 Oct. 2024</dd>
                       </div>
                     </dl>
                   </div>
