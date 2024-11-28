@@ -12,14 +12,39 @@ WITH
         FROM
             `chat_input`,
             LATERAL TABLE (
-                ML_PREDICT (
-                    'BedrockGeneralModel',
-                    (
-                        'You will be provided with a text conversation between a human user and an assistant.\nYour task is to summarize the conversation in a concise paragraph.\n\nThe summary should highlight the following points:\nThe initial greetings.\nThe main topic of the conversation.\nDetails about the product features discussed by the assistant.\nSpecific needs and requests mentioned by the human user, including name, address, and other relevant details if provided.\nDo not include any tags in your response.\nThe conversation is provided below, surrounded by triple quotes:\n“”"\n' || IFNULL (`history`, '') || '\n“”"\n\nPlease generate the summary according to the guidelines above.'
-                    )
-                )
-            )
-    )
+    ML_PREDICT (
+    'BedrockGeneralModel',
+   (
+    '<persona>
+        You are a conversation summarizer tasked with creating a concise summary of the overall dialogue between a human and an AI assistant. Your goal is to provide a high-level overview that preserves the key themes, decisions, and unresolved points in the conversation.
+    </persona>
+
+    <instructions>
+    Your role is to:
+    1. Summarize the main purpose or intent of the conversation.
+    2. Highlight key outcomes, decisions made, or information exchanged.
+    3. Note any unresolved issues, follow-up questions, or next steps.
+    4. Avoid including individual exchanges or redundant details.
+    5. Write the summary in clear, concise, and professional language.
+    6. Only include the response text without any additional instructions or explanations.
+    7. Only summaries if the conversation is not empty or missing.
+    8. Do not include any tags in your response.
+    9. Do not include your thinking.
+    10. Do not include any additional instructions or explanations in your response.
+    11. Only include the response text.
+    12. Do not start the response with "The summary is" or any similar phrase.
+    </instructions>
+
+    Focus on the overall context and relevance of the conversation to ensure continuity in future interactions.
+
+    <task>
+    Summarize the following continuous conversation in the provided format:
+
+    <conversation>
+    ' || IFNULL (`history`, '') || '
+</conversation>
+</task>'
+    ))))
 SELECT
     `sessionId` as requestId,
     `response` as `query`,
@@ -30,24 +55,36 @@ FROM
         ML_PREDICT (
             'BedrockGeneralModel',
             (
-                '
-You will be provided with the summary of a conversation between a human user and an assistant as well as the last request made by the human user.
+'<persona>
+    You are a query generator for a vector database. Your goal is to take the summary of a conversation, along with the last human request, and create an optimized query to search for relevant unstructured documents in a vector database. These documents may contain text, embeddings, or metadata related to the conversation''s themes.
+</persona>
 
-Your task is to generate a concise query that can be used to create an embedding for semantic search. The query should encapsulate the main points from the summary and the essence of the final human request.
+<instructions>
+Your role is to:
+1. Analyze the summary to extract key concepts, entities, and themes relevant to the query.
+2. Incorporate the last human request into the query to ensure it aligns with the most recent and specific intent of the conversation.
+3. Generate a concise query containing essential keywords, phrases, and contextual details to maximize relevance for a vector search.
+4. Include additional hints or metadata tags (if applicable) to refine the search, such as document type, date range, or context-specific terms.
+5. Avoid including unnecessary or redundant details to maintain focus and precision.
+6. Format the query as plain text suitable for vector-based semantic searches.
+7. Do not include any additional instructions or explanations in the query.
+8. Do not include any tags or metadata other than the query itself.
+9. Do not include your thinking.
+10. Do not include any additional instructions or explanations in your response.
+11. Only include the response text.
+</instructions>
 
-Ensure that your response contains only the query without any additional text or tags.
+<task>
+Based on the following conversation summary and the last human request, generate an optimized query for searching unstructured documents in a vector database:
 
-The summary of the conversation is provided below, surrounded by triple quotes:
-“”"
+<conversation_summary>
 ' || IFNULL (`history`, '') || '
-“”"
+</conversation_summary>
 
-The last request made by the human user is provided below, surrounded by triple quotes:
-“”"
+<last_human_request>
 ' || `input` || '
-“”"
-
-Generate the query according to the guidelines above.'
+</last_human_request>
+</task>'
             )
         )
     )
