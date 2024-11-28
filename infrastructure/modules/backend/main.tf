@@ -56,7 +56,7 @@ module "aws_websocket_api" {
 
   stage_access_log_settings = {
     create_log_group            = true
-    log_group_retention_in_days = 7
+    log_group_retention_in_days = 1
     format = jsonencode({
       context = {
         domainName              = "$context.domainName"
@@ -276,12 +276,12 @@ module "lambda_trigger_vector_search" {
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = 1
 
-  description   = "GenAi Quickstart Kafka Trigger Vector Search"
-  handler       = "io.confluent.pie.search.SearchHandler::handleRequest"
-  runtime       = "java17"
-  architectures = [var.system_architecture]
-  timeout       = 600
-  snap_start    = false
+  description                       = "GenAi Quickstart Kafka Trigger Vector Search"
+  handler                           = "io.confluent.pie.search.SearchHandler::handleRequest"
+  runtime                           = "java17"
+  architectures                     = [var.system_architecture]
+  timeout                           = 600
+  snap_start                        = false
   provisioned_concurrent_executions = 1
 
   environment_variables = {

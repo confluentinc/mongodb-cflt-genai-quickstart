@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
+import { FaSpinner } from "react-icons/fa"; // Add this line
 import type { ChatMessage } from "./ChatMessage.tsx";
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
+  isLoading: boolean; // Add this line
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ messages }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ messages, isLoading }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,6 +41,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ messages }) => {
           </div>
         </div>
       ))}
+      {isLoading && (
+        <div className="flex justify-center mt-4">
+          <FaSpinner className="animate-spin text-white" size={24} />
+        </div>
+      )}
       <div ref={messagesEndRef} />
     </div>
   );

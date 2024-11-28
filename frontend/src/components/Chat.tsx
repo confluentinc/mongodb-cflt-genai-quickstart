@@ -21,6 +21,7 @@ export default function Chat({ username }: { username: string }) {
 
   const [input, setInput] = useState("");
   const [messageHistory, setMessageHistory] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false); // Add this line
 
   const handleMessage = useCallback((event: WebSocketEventMap["message"]) => {
     console.log(event);
@@ -36,6 +37,7 @@ export default function Chat({ username }: { username: string }) {
     } catch (e) {
       console.debug("Invalid JSON message received:", event.data);
     }
+    setIsLoading(false); // Add this line
   }, []);
 
   const { sendJsonMessage, readyState } = useWebSocket<ChatMessage>(WS_URL, {
@@ -52,6 +54,8 @@ export default function Chat({ username }: { username: string }) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (input.trim() === "") return;
+
+    setIsLoading(true); // Add this line
 
     const chatMessage: ChatMessage = {
       role: "client",
@@ -85,7 +89,7 @@ export default function Chat({ username }: { username: string }) {
         className="fixed bottom-20 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg flex items-center justify-center w-12 h-12"
         onClick={toggleChat}
       >
-        <LiaCommentsDollarSolid size={40} /> {/* Use the chat icon */}
+        <LiaCommentsDollarSolid size={40} />
       </button>
       {isChatOpen && (
         <div className="fixed bottom-32 right-4 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col w-1/3">
@@ -96,7 +100,7 @@ export default function Chat({ username }: { username: string }) {
             </button>
           </div>
           <div className="flex flex-col flex-grow w-full max-w-screen-lg rounded-lg h-full overflow-y-auto">
-            <ChatMessages messages={messageHistory} />
+            <ChatMessages messages={messageHistory} isLoading={isLoading} />
             <ChatInput
               input={input}
               handleSubmit={handleSubmit}
