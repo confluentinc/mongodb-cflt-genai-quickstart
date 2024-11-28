@@ -4,7 +4,7 @@ Welcome to the Small Business Loan Agent Chatbot Quick Start! This repository pr
 
 This quick start is designed to help businesses streamline their loan application process by providing a chatbot that understands and answers customer queries, retrieves relevant loan documents, and provides actionable insights. The system also includes structured document indexing into MongoDB's vector database, enabling efficient retrieval-augmented generation (RAG) to enhance the chatbot's response accuracy.
 
-**Key Features**
+## Key Features
 
 * **Real-Time Data Processing**: Powered by Confluent Cloud and Flink, ensuring low-latency communication and event-driven architecture.
 * **Intelligent Conversations**: Integrated with Anthropic's AI models for natural and accurate conversational responses.
@@ -12,7 +12,7 @@ This quick start is designed to help businesses streamline their loan applicatio
 * **Scalable and Cloud-Native**: Built with AWS Lambda for a flexible and serverless REST API.
 * **Seamless Deployment**: Follow step-by-step instructions to deploy the entire solution with minimal effort.
 
-**Use Case**
+## Use Case
 
 This chatbot is tailored for small business loan agents to:
 
@@ -25,6 +25,8 @@ Whether you're exploring new ways to enhance customer engagement or testing gene
 ## Table of Contents
 
 - [GenAI Chatbot Quickstart](#genai-chatbot-quickstart)
+  - [Key Features](#key-features)
+  - [Use Case](#use-case)
   - [Table of Contents](#table-of-contents)
   - [Architecture](#architecture)
     - [Document Indexing](#document-indexing)
@@ -37,6 +39,9 @@ Whether you're exploring new ways to enhance customer engagement or testing gene
       - [MongoDB Atlas](#mongodb-atlas)
       - [AWS](#aws)
         - [Enable Foundation Model Access](#enable-foundation-model-access)
+        - [AWS API Keys](#aws-api-keys)
+          - [Managed Policies](#managed-policies)
+          - [Fine-tuned Policies](#fine-tuned-policies)
   - [Run the Quickstart](#run-the-quickstart)
     - [1. Bring up the infrastructure](#1-bring-up-the-infrastructure)
     - [2. Bring down the infrastructure](#2-bring-down-the-infrastructure)
@@ -116,8 +121,8 @@ If you feel like it, enter a name and description. Click the *Create API Key* (b
 
 Useful links:
 
-- [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization)
-- [MongoDB Atlas API Keys](https://www.mongodb.com/developer/products/atlas/mongodb-atlas-with-terraform/) (part of a tutorial on Terraform with Atlas)
+* [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization)
+* [MongoDB Atlas API Keys](https://www.mongodb.com/developer/products/atlas/mongodb-atlas-with-terraform/) (part of a tutorial on Terraform with Atlas)
 
 At last, get your Atlas Organization ID from the Atlas UI.
 
@@ -127,26 +132,38 @@ At last, get your Atlas Organization ID from the Atlas UI.
 
 ##### Enable Foundation Model Access
 
-As part of the Quickstart, we use `amazon.titan-embed-text-v2:0` and `anthropic.claude-3-haiku-20240307-v1:0` models. You'll need to navigate through the AWS Console to enable access to these models.
+Enable access to `amazon.titan-embed-text-v2:0` and `anthropic.claude-3-haiku-20240307-v1:0` models via the AWS Console.
 
 ![Enable Foundation Model Access](./assets/aws-enable-foundation-models.gif)
 
-AWS has many security credential types and authentication methods. No matter the one that you wish to use, or that your organization mandates, you'll get a key and secret that will have IAM rights (or policies) attached to it.
+##### AWS API Keys
 
-The AWS credentials that we need in this step are going to be used by Flink AI to connect to Bedrock.
+AWS credentials are required for Flink AI to connect to Bedrock, as well as using terraform to deploy resources. You will need a key and secret with appropriate IAM rights.
 
-You can attach on of these policies to your IAM identities:
+###### Managed Policies
 
-- AmazonBedrockFullAccess or AmazonBedrockStudioPermissionsBoundary
-- AWSLambdaRole or AWSLambda_FullAccess
+If you are using managed policies, Attach the following managed policies to your IAM user or role:
 
-Useful links:
+* `AmazonAPIGatewayAdministrator` - Manages and creates the websocket gateway.
+* `CloudFrontFullAccess` - Exposes the front end via CloudFront.
+* `IAMFullAccess` - Manages roles and policies for Lambda functions.
+* `AWSLambda_FullAccess` - Manages Lambda functions.
+* `CloudWatchFullAccess` - Manages logs and metrics.
+* `AmazonS3FullAccess` - Manages the S3 bucket for the front end and other Lambda resources.
+* `SecretsManagerReadWrite` - Manages secrets for Lambda functions.
+* `AmazonBedrockStudioPermissionsBoundary` - Invokes Bedrock foundational models.
 
-- [AWS API Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html)
-- [Bedrock policies](https://docs.aws.amazon.com/bedrock/latest/userguide/security-iam-awsmanpol.html)
-- [Lambda policies](https://docs.aws.amazon.com/lambda/latest/dg/permissions-user-function.html)
-- [Flink AI: Create Model](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#create-an-ai-model)
-- [Bedrock from Flink AI](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#aws-bedrock)
+###### Fine-tuned Policies
+
+For more granular permissions, refer to our [cloudtrail events](./assets/quickstart-iam-policy-cloudtrail.csv) for the exact resources and actions required.
+
+**Useful links:**
+
+* [AWS API Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html)
+* [Bedrock policies](https://docs.aws.amazon.com/bedrock/latest/userguide/security-iam-awsmanpol.html)
+* [Lambda policies](https://docs.aws.amazon.com/lambda/latest/dg/permissions-user-function.html)
+* [Flink AI: Create Model](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#create-an-ai-model)
+* [Bedrock from Flink AI](https://docs.confluent.io/cloud/current/ai/ai-model-inference.html#aws-bedrock)
 
 ## Run the Quickstart
 
@@ -161,4 +178,3 @@ Useful links:
 
 ```sh
 ./destroy.sh
-```
