@@ -48,7 +48,7 @@ WITH
 SELECT
     `sessionId` as requestId,
     `response` as `query`,
-    ROW (`input`, `userId`, `messageId`, `history`)
+    ROW (`input`, `userId`, `messageId`, `summary`)
 FROM
     summary,
     LATERAL TABLE (
