@@ -1,4 +1,5 @@
-insert into `products_summarized_with_embeddings`
+insert into
+    `products_summarized_with_embeddings`
 select
     product_id,
     summary,
@@ -16,5 +17,6 @@ select
     updatedAt,
     ref_link,
     embeddings
-from `products_summarized`,
-     LATERAL TABLE(ML_PREDICT('bedrock_titan_embed', summary));
+from
+    `products_summarized`,
+    LATERAL TABLE (ML_PREDICT ('BedrockTitanEmbed', summary));
