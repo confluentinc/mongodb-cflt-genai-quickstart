@@ -281,7 +281,8 @@ module "lambda_trigger_vector_search" {
   runtime       = "java17"
   architectures = [var.system_architecture]
   timeout       = 600
-  snap_start    = true
+  snap_start    = false
+  provisioned_concurrent_executions = 1
 
   environment_variables = {
     SR_URL    = var.schema_registry_url
@@ -296,6 +297,7 @@ module "lambda_trigger_vector_search" {
     MONGO_INDEX_NAME      = var.mongodb_vectorsearch_info.index_name
     MONGO_FIELD_PATH      = var.mongodb_vectorsearch_info.field_path
     SEARCH_RESULT_TOPIC   = var.vectorsearch_topics_info.output_topic
+    JAVA_TOOL_OPTIONS     = "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
   }
 
   layers = [
