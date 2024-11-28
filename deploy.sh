@@ -146,6 +146,8 @@ echo "[+] Setting up infrastructure/variables.tfvars"
 # populate tfvars file with AWS credentials
 cat << EOF > infrastructure/variables.tfvars
 aws_region = "$AWS_REGION"
+confluent_cloud_region = "$AWS_REGION"
+mongodbatlas_cloud_region = "$AWS_REGION"
 confluent_cloud_api_key = "$CONFLUENT_CLOUD_API_KEY"
 confluent_cloud_api_secret = "$CONFLUENT_CLOUD_API_SECRET"
 path_to_flink_sql_create_table_statements = "statements/create-tables"

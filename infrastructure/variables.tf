@@ -12,7 +12,6 @@ variable "confluent_cloud_api_secret" {
 variable "confluent_cloud_region" {
   description = "The region of Confluent Cloud Network"
   type        = string
-  default     = "us-east-1"
 }
 
 variable "confluent_cloud_service_provider" {
@@ -24,7 +23,6 @@ variable "confluent_cloud_service_provider" {
 variable "aws_region" {
   description = "The AWS region to deploy the infrastructure"
   type        = string
-  default     = "us-east-1"
 }
 
 variable "env_display_id_postfix" {
@@ -70,7 +68,6 @@ variable "mongodbatlas_cloud_provider" {
 variable "mongodbatlas_cloud_region" {
   description = "The region of MongoDB Atlas"
   type        = string
-  default     = "US_EAST_1"
 }
 
 variable "mongodbatlas_org_id" {
