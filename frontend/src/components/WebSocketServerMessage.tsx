@@ -1,4 +1,4 @@
 export interface WebSocketServerMessage {
-    userId: string;
-    output: string;
+  userId: string;
+  output: string;
 }

@@ -1,4 +1,5 @@
-insert into `products_summarized`
+insert into
+    `products_summarized`
 select
     product_id,
     summary,
@@ -15,6 +16,13 @@ select
     createdAt,
     updatedAt,
     ref_link
-from `products`,
-     LATERAL TABLE(ML_PREDICT('ProductSummarization', (
-'Product :\nProduct ID:' || `product_id` || '\nProduct Name: ' || `name` || '\nProduct Type: ' || `type` || '\nProduct Term Min Length: ' || `term_min_length` || '\nProduct Term Max Length: ' || `term_max_length` || '\nRepayment Frequency: ' || `repayment_frequency` || '\nProduct Risk Level: ' || `risk_level` || '\nProduct Status: ' || `status` || '\nRate Table: ' || `rate_table` || '\nProduct Created Date: ' || `createdAt` ||  '\nProduct Last Updated Date: ' || `updatedAt`  || '\nReference Link: ' || `ref_link`)));
+from
+    `products`,
+    LATERAL TABLE (
+        ML_PREDICT (
+            'ProductSummarization',
+            (
+                'Product :\nProduct ID:' || `product_id` || '\nProduct Name: ' || `name` || '\nProduct Type: ' || `type` || '\nProduct Term Min Length: ' || `term_min_length` || '\nProduct Term Max Length: ' || `term_max_length` || '\nRepayment Frequency: ' || `repayment_frequency` || '\nProduct Risk Level: ' || `risk_level` || '\nProduct Status: ' || `status` || '\nRate Table: ' || `rate_table` || '\nProduct Created Date: ' || `createdAt` || '\nProduct Last Updated Date: ' || `updatedAt` || '\nReference Link: ' || `ref_link`
+            )
+        )
+    );

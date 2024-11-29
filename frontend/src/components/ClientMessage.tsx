@@ -1,4 +1,4 @@
 export interface ClientMessage {
-    userId: string;
-    input: string;
+  userId: string;
+  input: string;
 }
