@@ -13,12 +13,11 @@ import {
 } from "react-icons/fa";
 
 export default function Dashboard({ username }: { username: string }) {
-
   return (
     <>
       <div className="min-h-screen bg-gray-100">
         <section className="flex">
-          <nav className="bg-white w-64 p-5 border-r border-gray-200">
+          <nav className="bg-white w-64 p-5 border-r border-gray-200 hidden md:block">
             <ul className="flex flex-col gap-1">
               <li>
                 <a
@@ -95,7 +94,6 @@ export default function Dashboard({ username }: { username: string }) {
             </ul>
           </nav>
 
-          {/* Main Content */}
           <div className="flex-grow p-6 space-y-6">
             {/* Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -141,7 +139,7 @@ export default function Dashboard({ username }: { username: string }) {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-white/80">VALID THRU</p>
-                      <p className="text-xl">12/22</p>
+                      <p className="text-xl">12/25</p>
                     </div>
                   </div>
                 </div>
@@ -170,7 +168,7 @@ export default function Dashboard({ username }: { username: string }) {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-white/80">VALID THRU</p>
-                      <p className="text-xl">08/23</p>
+                      <p className="text-xl">08/25</p>
                     </div>
                   </div>
                 </div>
@@ -232,10 +230,10 @@ export default function Dashboard({ username }: { username: string }) {
                 </div>
               </div>
               <div className="space-y-6">
-                <div className="flex justify-between items-center p-6 bg-slate-200 rounded-md">
+                <div className="flex flex-col md:flex-row justify-between items-center p-6 bg-slate-200 rounded-md">
                   <div className="flex items-center flex-1 gap-6">
                     <FaApple className="w-12 h-12 text-black" />
-                    <dl className="grid grid-cols-3 gap-8 w-full">
+                    <dl className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
                       <div className="flex flex-col items-start">
                         <dt className="font-semibold text-gray-800">
                           Apple Inc.
@@ -259,10 +257,10 @@ export default function Dashboard({ username }: { username: string }) {
                   <div className="text-red-600 font-semibold ml-6">- $550</div>
                 </div>
 
-                <div className="flex justify-between items-center p-6 bg-slate-200 rounded-md">
+                <div className="flex flex-col md:flex-row justify-between items-center p-6 bg-slate-200 rounded-md">
                   <div className="flex items-center flex-1 gap-6">
                     <FaPinterest className="w-12 h-12 text-red-500" />
-                    <dl className="grid grid-cols-3 gap-8 w-full">
+                    <dl className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
                       <div className="flex flex-col items-start">
                         <dt className="font-semibold text-gray-800">
                           Pinterest
@@ -285,10 +283,10 @@ export default function Dashboard({ username }: { username: string }) {
                   </div>
                   <div className="text-red-600 font-semibold ml-6">- $120</div>
                 </div>
-                <div className="flex justify-between items-center p-6 bg-slate-200 rounded-md">
+                <div className="flex flex-col md:flex-row justify-between items-center p-6 bg-slate-200 rounded-md">
                   <div className="flex items-center flex-1 gap-6">
                     <FaFilm className="w-12 h-12 text-yellow-500" />
-                    <dl className="grid grid-cols-3 gap-8 w-full">
+                    <dl className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
                       <div className="flex flex-col items-start">
                         <dt className="font-semibold text-gray-800">
                           Warner Bros.
@@ -314,7 +312,7 @@ export default function Dashboard({ username }: { username: string }) {
           </div>
         </section>
       </div>
-      <Chat username={username} />
+        <Chat username={username} />
     </>
   );
 }
