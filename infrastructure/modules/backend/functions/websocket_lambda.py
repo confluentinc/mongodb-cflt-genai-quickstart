@@ -97,6 +97,7 @@ def lambda_handler(event, context):
         'security.protocol': 'SASL_SSL',
         'sasl.mechanisms': 'PLAIN',
         'acks': 'all',
+        'client.id': 'PIE_LABS|GENAI_MONGODB_QUICKSTART',
     }
 
     schema_registry_client = SchemaRegistryClient(sr_config)

@@ -48,6 +48,7 @@ public class ConfigUtils {
             put(KEY_SERIALIZER_CLASS_CONFIG, SearchResultsKeySerializer.class.getCanonicalName());
             put(VALUE_SERIALIZER_CLASS_CONFIG, SearchResultsSerializer.class.getCanonicalName());
             put(ACKS_CONFIG, "all");
+            put(CLIENT_ID_CONFIG, "PIE_LABS|GENAI_MONGODB_QUICKSTART");
             if (credentials != null) {
                 final String jaas = "org.apache.kafka.common.security.plain.PlainLoginModule required username='" + credentials.username() + "' password='" + credentials.password() + "';";
 
