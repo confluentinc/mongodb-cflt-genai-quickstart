@@ -22,6 +22,8 @@ This chatbot is tailored for small business loan agents to:
 
 Whether you're exploring new ways to enhance customer engagement or testing generative AI use cases in financial services, this quick start provides the perfect foundation.
 
+👉 Please note that this quick start builds a working AI infrastructure for you, but it's fueled by a small quantity of fake data, so the results won't be at the level that you're accustomed to with AI chatbots like Chat-GPT. Read the Next Steps section at the end of this document to find out how you can tweak the architecture and improve or alter the AI results.
+
 ## Table of Contents
 
 - [GenAI Chatbot Quickstart](#genai-chatbot-quickstart)
@@ -227,3 +229,11 @@ VALUES
 ```sh
 ./destroy.sh
 ```
+
+## Next Steps - Improving the Results
+
+There are numerous actions you can take to influence the responses given by the chatbot:
+- Increase the size and the quality of the data set. This demo is built on top of a very small set of insurance products (found in `infrastructure/statements/insert/populate-products.sql`), and the description of each product is limited to only a couple of fields. You can also modify the prompt used for summarizing the products in `infrastructure/statements/insert/populate-products-summarized.sql`.
+- Modify the prompts controlling the chat. They are located in: `infrastructure/statements/insert/chat-input-query.sql` and `infrastructure/statements/insert/populate-chat-output.sql`
+- Modify the vectorization and search of the embeddings inside MongoDB Atlas: it's in `infrastructure/main.tf`, under `resource "mongodbatlas_search_index" "search-vector" {`. Check [Atlas Vector Search Index Fields](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-type/#atlas-vector-search-index-fields) and [Vector Search Queries](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/) for more details.
+- Modify the parameters of the models, found in `infrastructure/statements/create-models/bedrock-titan-embed.sql`. Modifying the `temperature` of the model can yield to more accurate or creative results. Check [Anthropic Claude models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-claude.html) for more details on the model parameters.
