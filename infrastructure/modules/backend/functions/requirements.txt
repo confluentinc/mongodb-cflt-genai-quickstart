@@ -1,4 +1,4 @@
-boto3==1.37.9
+boto3==1.37.10
 confluent-kafka==2.8.2
 jsonschema==4.23.0
 requests==2.32.3
