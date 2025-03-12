@@ -30,7 +30,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-json-schema-serializer</artifactId>
-            <version>7.9.1-24</version>
+            <version>7.9.1-25</version>
         </dependency>
 
         <dependency>
