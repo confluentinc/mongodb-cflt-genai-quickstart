@@ -3,7 +3,8 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 module "aws_websocket_api" {
-  source = "terraform-aws-modules/apigateway-v2/aws"
+  source  = "terraform-aws-modules/apigateway-v2/aws"
+  version = "~> 5.2.1"
 
   # API
   description = "Chatbot AWS API Websocket Gateway"

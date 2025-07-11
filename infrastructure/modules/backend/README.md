@@ -17,7 +17,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_aws_websocket_api"></a> [aws\_websocket\_api](#module\_aws\_websocket\_api) | terraform-aws-modules/apigateway-v2/aws | n/a |
+| <a name="module_aws_websocket_api"></a> [aws\_websocket\_api](#module\_aws\_websocket\_api) | terraform-aws-modules/apigateway-v2/aws | ~> 5.2.1 |
 | <a name="module_lambda_trigger_connections_api"></a> [lambda\_trigger\_connections\_api](#module\_lambda\_trigger\_connections\_api) | terraform-aws-modules/lambda/aws | ~> 4.0 |
 | <a name="module_lambda_trigger_vector_search"></a> [lambda\_trigger\_vector\_search](#module\_lambda\_trigger\_vector\_search) | terraform-aws-modules/lambda/aws | ~> 4.0 |
 | <a name="module_websocket_chat_api_lambda"></a> [websocket\_chat\_api\_lambda](#module\_websocket\_chat\_api\_lambda) | terraform-aws-modules/lambda/aws | ~> 4.0 |
