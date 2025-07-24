@@ -2,3 +2,6 @@ boto3==1.38.18
 confluent-kafka==2.10.0
 jsonschema==4.23.0
 requests==2.32.4
+httpx>=0.28.0
+cachetools>=6.1.0
+authlib==1.6.0 

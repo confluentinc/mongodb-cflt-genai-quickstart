@@ -1,6 +1,6 @@
 import { WS_URL } from "astro:env/client";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import ChatInput from "./ChatInput.tsx";
 import ChatMessages from "./ChatMessages.tsx";
 import type { ChatMessage } from "./ChatMessage.tsx";
@@ -21,7 +21,8 @@ export default function Chat({ username }: { username: string }) {
 
   const [input, setInput] = useState("");
   const [messageHistory, setMessageHistory] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false); // Add this line
+  const [isLoading, setIsLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<string>("Connecting...");
 
   const handleMessage = useCallback((event: WebSocketEventMap["message"]) => {
     console.log(event);
@@ -37,15 +38,62 @@ export default function Chat({ username }: { username: string }) {
     } catch (e) {
       console.debug("Invalid JSON message received:", event.data);
     }
-    setIsLoading(false); // Add this line
+    setIsLoading(false);
   }, []);
 
   const { sendJsonMessage, readyState } = useWebSocket<ChatMessage>(WS_URL, {
-    onOpen: () => console.log("WebSocket connection opened!"),
-    onClose: (event) => console.log("WebSocket connection closed!: ", event),
-    onError: (event) => console.error("WebSocket error:", event),
+    onOpen: () => {
+      console.log("WebSocket connection opened!");
+      setConnectionStatus("Connected");
+    },
+    onClose: (event) => {
+      console.log("WebSocket connection closed!: ", event);
+      setConnectionStatus("Disconnected");
+    },
+    onError: (event) => {
+      console.error("WebSocket error:", event);
+      setConnectionStatus("Error - Retrying...");
+    },
     onMessage: handleMessage,
+    // Add retry configuration
+    shouldReconnect: (closeEvent) => {
+      console.log("Should reconnect:", closeEvent);
+      return true; // Always try to reconnect
+    },
+    reconnectInterval: (attemptNumber) => {
+      // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
+      return Math.min(1000 * Math.pow(2, attemptNumber), 30000);
+    },
+    reconnectAttempts: 10,
+    // Connection timeout
+    heartbeat: {
+      message: JSON.stringify({ type: "ping" }),
+      returnMessage: JSON.stringify({ type: "pong" }),
+      timeout: 30000, // 30 seconds
+      interval: 30000, // 30 seconds
+    },
   });
+
+  // Update connection status based on readyState
+  useEffect(() => {
+    switch (readyState) {
+      case ReadyState.CONNECTING:
+        setConnectionStatus("Connecting...");
+        break;
+      case ReadyState.OPEN:
+        setConnectionStatus("Connected");
+        break;
+      case ReadyState.CLOSING:
+        setConnectionStatus("Disconnecting...");
+        break;
+      case ReadyState.CLOSED:
+        setConnectionStatus("Disconnected");
+        break;
+      case ReadyState.UNINSTANTIATED:
+        setConnectionStatus("Not Connected");
+        break;
+    }
+  }, [readyState]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
@@ -53,9 +101,9 @@ export default function Chat({ username }: { username: string }) {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (input.trim() === "") return;
+    if (input.trim() === "" || readyState !== ReadyState.OPEN) return;
 
-    setIsLoading(true); // Add this line
+    setIsLoading(true);
 
     const chatMessage: ChatMessage = {
       role: "client",
@@ -79,8 +127,25 @@ export default function Chat({ username }: { username: string }) {
 
     console.log(clientMessage);
 
-    sendJsonMessage(clientMessage);
-    setInput("");
+    try {
+      sendJsonMessage(clientMessage);
+      setInput("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setIsLoading(false);
+      // Optionally show error message to user
+    }
+  };
+
+  const getConnectionStatusColor = () => {
+    switch (readyState) {
+      case ReadyState.OPEN:
+        return "text-green-500";
+      case ReadyState.CONNECTING:
+        return "text-yellow-500";
+      default:
+        return "text-red-500";
+    }
   };
 
   return (
@@ -95,9 +160,14 @@ export default function Chat({ username }: { username: string }) {
         <div className="fixed bottom-32 right-4 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col w-11/12 md:w-1/3">
           <div className="flex justify-between items-center p-4 bg-blue-500 rounded-t-lg">
             <h1 className="text-xl font-bold">Big Friendly Bank</h1>
-            <button onClick={toggleChat} className="text-white">
-              X
-            </button>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm ${getConnectionStatusColor()}`}>
+                {connectionStatus}
+              </span>
+              <button onClick={toggleChat} className="text-white">
+                X
+              </button>
+            </div>
           </div>
           <div className="flex flex-col flex-grow w-full max-w-screen-lg rounded-lg h-full overflow-y-auto">
             <ChatMessages messages={messageHistory} isLoading={isLoading} />

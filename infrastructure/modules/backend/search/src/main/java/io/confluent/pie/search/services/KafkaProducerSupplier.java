@@ -46,7 +46,7 @@ public class KafkaProducerSupplier implements Supplier<Producer<SearchResultsKey
                     configuration.getCcCredentials(),
                     configuration.getSrURL(),
                     configuration.getSrCredentials(),
-                    false);
+                    true); // true to enable schema registry
 
             return new KafkaProducer<>(properties);
         } catch (Throwable e) {

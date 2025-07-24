@@ -11,7 +11,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.19.0</version>
+                <version>2.15.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -23,26 +23,26 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>5.5.0</version>
+            <version>5.0.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.confluent/kafka-json-schema-serializer -->
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-json-schema-serializer</artifactId>
-            <version>7.9.1-180</version>
+            <version>7.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-            <version>3.9.1</version>
+            <version>3.7.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-secretsmanager -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-secretsmanager</artifactId>
-            <version>1.12.783</version>
+            <version>1.12.778</version>
         </dependency>
 
         <dependency>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-events</artifactId>
-            <version>3.15.0</version>
+            <version>3.14.0</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -65,43 +65,43 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.17</version>
+            <version>2.0.16</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>2.0.17</version>
+            <version>2.0.16</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
+            <version>1.5.8</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
+            <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.12.2</version>
+            <version>5.10.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.21.0</version>
+            <version>1.20.4</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.testcontainers/kafka -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
-            <version>1.21.0</version>
+            <version>1.20.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

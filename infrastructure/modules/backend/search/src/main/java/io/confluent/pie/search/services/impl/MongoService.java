@@ -19,7 +19,9 @@ import java.util.List;
 import static com.google.common.primitives.Doubles.asList;
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
-import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Projections.exclude;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.metaVectorSearchScore;
 import static com.mongodb.client.model.search.SearchPath.fieldPath;
 
 /**
