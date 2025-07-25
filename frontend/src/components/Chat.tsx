@@ -47,7 +47,7 @@ export default function Chat({ username }: { username: string }) {
       setConnectionStatus("Connected");
     },
     onClose: (event) => {
-      console.log("WebSocket connection closed!: ", event);
+      console.log("WebSocket connection closed:", event.code, event.reason);
       setConnectionStatus("Disconnected");
     },
     onError: (event) => {
@@ -55,22 +55,26 @@ export default function Chat({ username }: { username: string }) {
       setConnectionStatus("Error - Retrying...");
     },
     onMessage: handleMessage,
-    // Add retry configuration
+    // Improved retry configuration for better reliability
     shouldReconnect: (closeEvent) => {
-      console.log("Should reconnect:", closeEvent);
-      return true; // Always try to reconnect
+      console.log("Should reconnect:", closeEvent?.code, closeEvent?.reason);
+      // Always reconnect except for intentional closures (1000) or auth failures (4001-4003)
+      return closeEvent?.code !== 1000 && !(closeEvent?.code >= 4001 && closeEvent?.code <= 4003);
     },
     reconnectInterval: (attemptNumber) => {
-      // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
-      return Math.min(1000 * Math.pow(2, attemptNumber), 30000);
+      // More aggressive reconnection: 500ms, 1s, 2s, 4s, 8s, max 15s
+      const interval = Math.min(500 * Math.pow(2, attemptNumber), 15000);
+      console.log(`Reconnect attempt ${attemptNumber + 1}, waiting ${interval}ms`);
+      return interval;
     },
-    reconnectAttempts: 10,
-    // Connection timeout
+    reconnectAttempts: 15, // Increased attempts
+  
+    // More frequent heartbeat for better connection detection
     heartbeat: {
       message: JSON.stringify({ type: "ping" }),
       returnMessage: JSON.stringify({ type: "pong" }),
-      timeout: 30000, // 30 seconds
-      interval: 30000, // 30 seconds
+      timeout: 80000, 
+      interval: 80000, 
     },
   });
 
