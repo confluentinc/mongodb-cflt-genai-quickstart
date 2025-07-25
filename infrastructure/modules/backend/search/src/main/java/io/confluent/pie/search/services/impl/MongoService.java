@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.search.FieldSearchPath;
+import com.mongodb.client.model.search.VectorSearchOptions;
 import io.confluent.pie.search.models.Credentials;
 import io.confluent.pie.search.models.SearchRequest;
 import io.confluent.pie.search.services.DBService;
@@ -83,12 +84,14 @@ public class MongoService implements Closeable, DBService {
         final List<Document> products = new ArrayList<>();
         final boolean hasScoreFilter = request.minScore() > 0;
 
+        final VectorSearchOptions options = VectorSearchOptions.approximateVectorSearchOptions((long) request.numberOfCandidate());
+        
         final List<Bson> pipeline = List.of(vectorSearch(
                         fieldSearchPath,
                         asList(request.embeddings()),
                         indexName,
-                        request.numberOfCandidate(),
-                        request.limit()),
+                        (long) request.limit(),
+                        options),
                 project(fields(
                         exclude(embeddingsFieldName),
                         metaVectorSearchScore("score"))));

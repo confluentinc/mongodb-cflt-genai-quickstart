@@ -23,6 +23,7 @@ export default function Chat({ username }: { username: string }) {
   const [messageHistory, setMessageHistory] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<string>("Connecting...");
+  const [isReconnecting, setIsReconnecting] = useState(false);
 
   const handleMessage = useCallback((event: WebSocketEventMap["message"]) => {
     console.log(event);
@@ -45,36 +46,44 @@ export default function Chat({ username }: { username: string }) {
     onOpen: () => {
       console.log("WebSocket connection opened!");
       setConnectionStatus("Connected");
+      setIsReconnecting(false);
     },
     onClose: (event) => {
-      console.log("WebSocket connection closed:", event.code, event.reason);
-      setConnectionStatus("Disconnected");
+      console.log("WebSocket connection closed!: ", event);
+      // Only show disconnected if we're not actively reconnecting
+      if (!isReconnecting) {
+        setConnectionStatus("Disconnected");
+      }
     },
     onError: (event) => {
       console.error("WebSocket error:", event);
       setConnectionStatus("Error - Retrying...");
+      setIsReconnecting(true);
     },
     onMessage: handleMessage,
-    // Improved retry configuration for better reliability
+    onReconnectStop: () => {
+      console.log("Reconnection attempts stopped");
+      setConnectionStatus("Disconnected");
+      setIsReconnecting(false);
+    },
+    // Add retry configuration
     shouldReconnect: (closeEvent) => {
-      console.log("Should reconnect:", closeEvent?.code, closeEvent?.reason);
-      // Always reconnect except for intentional closures (1000) or auth failures (4001-4003)
-      return closeEvent?.code !== 1000 && !(closeEvent?.code >= 4001 && closeEvent?.code <= 4003);
+      console.log("Should reconnect:", closeEvent);
+      setIsReconnecting(true);
+      setConnectionStatus("Reconnecting...");
+      return true; // Always try to reconnect
     },
     reconnectInterval: (attemptNumber) => {
-      // More aggressive reconnection: 500ms, 1s, 2s, 4s, 8s, max 15s
-      const interval = Math.min(500 * Math.pow(2, attemptNumber), 15000);
-      console.log(`Reconnect attempt ${attemptNumber + 1}, waiting ${interval}ms`);
-      return interval;
+      // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
+      return Math.min(1000 * Math.pow(2, attemptNumber), 30000);
     },
-    reconnectAttempts: 15, // Increased attempts
-  
-    // More frequent heartbeat for better connection detection
+    reconnectAttempts: 10,
+    // Connection timeout
     heartbeat: {
       message: JSON.stringify({ type: "ping" }),
       returnMessage: JSON.stringify({ type: "pong" }),
-      timeout: 80000, 
-      interval: 80000, 
+      timeout: 60000, // 60 seconds
+      interval: 60000, // 60 seconds
     },
   });
 
@@ -82,22 +91,27 @@ export default function Chat({ username }: { username: string }) {
   useEffect(() => {
     switch (readyState) {
       case ReadyState.CONNECTING:
-        setConnectionStatus("Connecting...");
+        if (!isReconnecting) {
+          setConnectionStatus("Connecting...");
+        }
         break;
       case ReadyState.OPEN:
         setConnectionStatus("Connected");
+        setIsReconnecting(false);
         break;
       case ReadyState.CLOSING:
         setConnectionStatus("Disconnecting...");
         break;
       case ReadyState.CLOSED:
-        setConnectionStatus("Disconnected");
+        if (!isReconnecting) {
+          setConnectionStatus("Disconnected");
+        }
         break;
       case ReadyState.UNINSTANTIATED:
         setConnectionStatus("Not Connected");
         break;
     }
-  }, [readyState]);
+  }, [readyState, isReconnecting]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
@@ -105,7 +119,10 @@ export default function Chat({ username }: { username: string }) {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (input.trim() === "" || readyState !== ReadyState.OPEN) return;
+    if (input.trim() === "") return;
+    
+    // Only prevent submission if truly disconnected (not reconnecting)
+    if (readyState !== ReadyState.OPEN && !isReconnecting) return;
 
     setIsLoading(true);
 
@@ -142,6 +159,10 @@ export default function Chat({ username }: { username: string }) {
   };
 
   const getConnectionStatusColor = () => {
+    if (isReconnecting) {
+      return "text-yellow-500"; // Show yellow during reconnection attempts
+    }
+    
     switch (readyState) {
       case ReadyState.OPEN:
         return "text-green-500";
@@ -179,7 +200,7 @@ export default function Chat({ username }: { username: string }) {
               input={input}
               handleSubmit={handleSubmit}
               handleInputChange={handleInputChange}
-              isDisabled={readyState !== ReadyState.OPEN}
+              isDisabled={readyState !== ReadyState.OPEN && !isReconnecting}
             />
           </div>
         </div>
