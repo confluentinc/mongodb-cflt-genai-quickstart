@@ -117,6 +117,7 @@ module "websocket_chat_api_lambda" {
   handler       = "websocket_lambda.lambda_handler"
   runtime       = "python3.12"
   architectures = [var.system_architecture]
+  memory_size   = 512
 
   environment_variables = {
     SCHEMA_REGISTRY_URL        = var.schema_registry_url
@@ -281,6 +282,7 @@ module "lambda_trigger_vector_search" {
   handler                           = "io.confluent.pie.search.SearchHandler::handleRequest"
   runtime                           = "java17"
   architectures                     = [var.system_architecture]
+  memory_size                       = 1024
   timeout                           = 600
   snap_start                        = false
   provisioned_concurrent_executions = 1

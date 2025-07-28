@@ -1,6 +1,6 @@
 import { WS_URL } from "astro:env/client";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import ChatInput from "./ChatInput.tsx";
 import ChatMessages from "./ChatMessages.tsx";
 import type { ChatMessage } from "./ChatMessage.tsx";
@@ -21,7 +21,9 @@ export default function Chat({ username }: { username: string }) {
 
   const [input, setInput] = useState("");
   const [messageHistory, setMessageHistory] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false); // Add this line
+  const [isLoading, setIsLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<string>("Connecting...");
+  const [isReconnecting, setIsReconnecting] = useState(false);
 
   const handleMessage = useCallback((event: WebSocketEventMap["message"]) => {
     console.log(event);
@@ -37,15 +39,79 @@ export default function Chat({ username }: { username: string }) {
     } catch (e) {
       console.debug("Invalid JSON message received:", event.data);
     }
-    setIsLoading(false); // Add this line
+    setIsLoading(false);
   }, []);
 
   const { sendJsonMessage, readyState } = useWebSocket<ChatMessage>(WS_URL, {
-    onOpen: () => console.log("WebSocket connection opened!"),
-    onClose: (event) => console.log("WebSocket connection closed!: ", event),
-    onError: (event) => console.error("WebSocket error:", event),
+    onOpen: () => {
+      console.log("WebSocket connection opened!");
+      setConnectionStatus("Connected");
+      setIsReconnecting(false);
+    },
+    onClose: (event) => {
+      console.log("WebSocket connection closed!: ", event);
+      // Only show disconnected if we're not actively reconnecting
+      if (!isReconnecting) {
+        setConnectionStatus("Disconnected");
+      }
+    },
+    onError: (event) => {
+      console.error("WebSocket error:", event);
+      setConnectionStatus("Error - Retrying...");
+      setIsReconnecting(true);
+    },
     onMessage: handleMessage,
+    onReconnectStop: () => {
+      console.log("Reconnection attempts stopped");
+      setConnectionStatus("Disconnected");
+      setIsReconnecting(false);
+    },
+    // Add retry configuration
+    shouldReconnect: (closeEvent) => {
+      console.log("Should reconnect:", closeEvent);
+      setIsReconnecting(true);
+      setConnectionStatus("Reconnecting...");
+      return true; // Always try to reconnect
+    },
+    reconnectInterval: (attemptNumber) => {
+      // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
+      return Math.min(1000 * Math.pow(2, attemptNumber), 30000);
+    },
+    reconnectAttempts: 10,
+    // Connection timeout
+    heartbeat: {
+      message: JSON.stringify({ type: "ping" }),
+      returnMessage: JSON.stringify({ type: "pong" }),
+      timeout: 60000, // 60 seconds
+      interval: 60000, // 60 seconds
+    },
   });
+
+  // Update connection status based on readyState
+  useEffect(() => {
+    switch (readyState) {
+      case ReadyState.CONNECTING:
+        if (!isReconnecting) {
+          setConnectionStatus("Connecting...");
+        }
+        break;
+      case ReadyState.OPEN:
+        setConnectionStatus("Connected");
+        setIsReconnecting(false);
+        break;
+      case ReadyState.CLOSING:
+        setConnectionStatus("Disconnecting...");
+        break;
+      case ReadyState.CLOSED:
+        if (!isReconnecting) {
+          setConnectionStatus("Disconnected");
+        }
+        break;
+      case ReadyState.UNINSTANTIATED:
+        setConnectionStatus("Not Connected");
+        break;
+    }
+  }, [readyState, isReconnecting]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
@@ -54,8 +120,11 @@ export default function Chat({ username }: { username: string }) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (input.trim() === "") return;
+    
+    // Only prevent submission if truly disconnected (not reconnecting)
+    if (readyState !== ReadyState.OPEN && !isReconnecting) return;
 
-    setIsLoading(true); // Add this line
+    setIsLoading(true);
 
     const chatMessage: ChatMessage = {
       role: "client",
@@ -79,8 +148,29 @@ export default function Chat({ username }: { username: string }) {
 
     console.log(clientMessage);
 
-    sendJsonMessage(clientMessage);
-    setInput("");
+    try {
+      sendJsonMessage(clientMessage);
+      setInput("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setIsLoading(false);
+      // Optionally show error message to user
+    }
+  };
+
+  const getConnectionStatusColor = () => {
+    if (isReconnecting) {
+      return "text-yellow-500"; // Show yellow during reconnection attempts
+    }
+    
+    switch (readyState) {
+      case ReadyState.OPEN:
+        return "text-green-500";
+      case ReadyState.CONNECTING:
+        return "text-yellow-500";
+      default:
+        return "text-red-500";
+    }
   };
 
   return (
@@ -95,9 +185,14 @@ export default function Chat({ username }: { username: string }) {
         <div className="fixed bottom-32 right-4 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col w-11/12 md:w-1/3">
           <div className="flex justify-between items-center p-4 bg-blue-500 rounded-t-lg">
             <h1 className="text-xl font-bold">Big Friendly Bank</h1>
-            <button onClick={toggleChat} className="text-white">
-              X
-            </button>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm ${getConnectionStatusColor()}`}>
+                {connectionStatus}
+              </span>
+              <button onClick={toggleChat} className="text-white">
+                X
+              </button>
+            </div>
           </div>
           <div className="flex flex-col flex-grow w-full max-w-screen-lg rounded-lg h-full overflow-y-auto">
             <ChatMessages messages={messageHistory} isLoading={isLoading} />
@@ -105,7 +200,7 @@ export default function Chat({ username }: { username: string }) {
               input={input}
               handleSubmit={handleSubmit}
               handleInputChange={handleInputChange}
-              isDisabled={readyState !== ReadyState.OPEN}
+              isDisabled={readyState !== ReadyState.OPEN && !isReconnecting}
             />
           </div>
         </div>
