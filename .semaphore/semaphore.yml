@@ -9,7 +9,7 @@ execution_time_limit:
   hours: 1
 
 queue:
-  - when: "branch != 'master'"
+  - when: "branch != 'main'"
     processing: parallel
 
 blocks:
