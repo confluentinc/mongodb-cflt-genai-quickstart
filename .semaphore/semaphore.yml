@@ -1,4 +1,3 @@
-# MongoDB Confluent GenAI Quickstart CI/CD Pipeline
 version: v1.0
 name: Build
 agent:
