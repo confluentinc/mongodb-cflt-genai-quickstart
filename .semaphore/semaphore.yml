@@ -2,17 +2,14 @@ version: v1.0
 name: Build
 agent:
   machine:
-    type: s1-prod-ubuntu20-04-amd64-1
+    type: s1-prod-ubuntu24-04-amd64-1
 
 execution_time_limit:
   hours: 1
 
-queue:
-  - when: "branch != 'main'"
-    processing: parallel
-
 blocks:
   - name: "Frontend Build"
+    dependencies: []
     task:
       env_vars:
         - name: NODE_VERSION
@@ -32,6 +29,7 @@ blocks:
             - echo "Frontend build completed successfully"
 
   - name: "Java Backend Build"
+    dependencies: []
     task:
       env_vars:
         - name: JAVA_VERSION
@@ -49,6 +47,7 @@ blocks:
             - echo "Java backend build completed successfully"
 
   - name: "Infrastructure Validation"
+    dependencies: []
     task:
       env_vars:
         - name: TERRAFORM_VERSION
