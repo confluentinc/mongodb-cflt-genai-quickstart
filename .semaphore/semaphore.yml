@@ -1,0 +1,70 @@
+version: v1.0
+name: Build
+agent:
+  machine:
+    type: s1-prod-ubuntu20-04-amd64-1
+
+execution_time_limit:
+  hours: 1
+
+queue:
+  - when: "branch != 'main'"
+    processing: parallel
+
+blocks:
+  - name: "Frontend Build"
+    task:
+      env_vars:
+        - name: NODE_VERSION
+          value: "18"
+      prologue:
+        commands:
+          - checkout
+          - nvm use $NODE_VERSION
+          - cd frontend
+      jobs:
+        - name: "Build Frontend Application"
+          commands:
+            - echo "Installing frontend dependencies..."
+            - npm ci
+            - echo "Running type checking and building frontend..."
+            - npm run build
+            - echo "Frontend build completed successfully"
+
+  - name: "Java Backend Build"
+    task:
+      env_vars:
+        - name: JAVA_VERSION
+          value: "17"
+      prologue:
+        commands:
+          - checkout
+          - sem-version java $JAVA_VERSION
+          - cd infrastructure/modules/backend/search
+      jobs:
+        - name: "Build Java Search Service"
+          commands:
+            - echo "Building Java search service"
+            - mvn clean package -DskipTests
+            - echo "Java backend build completed successfully"
+
+  - name: "Infrastructure Validation"
+    task:
+      env_vars:
+        - name: TERRAFORM_VERSION
+          value: "1.5.7"
+      prologue:
+        commands:
+          - checkout
+          - sem-version terraform $TERRAFORM_VERSION
+          - cd infrastructure
+      jobs:
+        - name: "Validate Terraform Configuration"
+          commands:
+            - echo "Initializing Terraform..."
+            - terraform init -backend=false
+            - echo "Validating Terraform configuration..."
+            - terraform validate
+            - echo "Checking Terraform formatting..."
+            - terraform fmt -check -recursive
+            - echo "Infrastructure validation completed successfully"
