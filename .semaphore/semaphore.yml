@@ -14,6 +14,8 @@ blocks:
       env_vars:
         - name: NODE_VERSION
           value: "18"
+        - name: WS_URL
+          value: "http://localhost"
       prologue:
         commands:
           - checkout
