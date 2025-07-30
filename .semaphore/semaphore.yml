@@ -65,10 +65,11 @@ blocks:
       jobs:
         - name: "Validate Terraform Configuration"
           commands:
-            - echo "Initializing Terraform..."
-            - terraform init -backend=false
+            - echo "terraform is installed at ${ROOT_DIR}"
+            - ${ROOT_DIR}/terraform version"
+            - ${ROOT_DIR}/terraform init -backend=false
             - echo "Validating Terraform configuration..."
-            - terraform validate
+            - ${ROOT_DIR}/terraform validate
             - echo "Checking Terraform formatting..."
-            - terraform fmt -check -recursive
+            - ${ROOT_DIR}/terraform fmt -check -recursive
             - echo "Infrastructure validation completed successfully"
