@@ -51,13 +51,14 @@ blocks:
   - name: "Infrastructure Validation"
     dependencies: []
     task:
+      env_vars:
+        - name: TERRAFORM_VERSION
+          value: "1.12.2"
       prologue:
         commands:
-          # Install Terraform
-          - terraformVersion=1.12.2
-          - 'terraformUrl="https://releases.hashicorp.com/terraform/${terraformVersion}/terraform_${terraformVersion}_linux_amd64.zip"'
+          - 'terraformUrl="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"'
           - 'curl -LO ${terraformUrl}'
-          - 'unzip terraform_${terraformVersion}_linux_amd64.zip'
+          - 'unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip'
           - ROOT_DIR=`pwd`
 
           - checkout
