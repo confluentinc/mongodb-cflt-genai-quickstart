@@ -51,13 +51,9 @@ blocks:
   - name: "Infrastructure Validation"
     dependencies: []
     task:
-      env_vars:
-        - name: TERRAFORM_VERSION
-          value: "1.5.7"
       prologue:
         commands:
           - checkout
-          - sem-version terraform $TERRAFORM_VERSION
           - cd infrastructure
       jobs:
         - name: "Validate Terraform Configuration"
