@@ -2,21 +2,20 @@ version: v1.0
 name: Build
 agent:
   machine:
-    type: s1-prod-ubuntu20-04-amd64-1
+    type: s1-prod-ubuntu24-04-amd64-1
 
 execution_time_limit:
   hours: 1
 
-queue:
-  - when: "branch != 'main'"
-    processing: parallel
-
 blocks:
   - name: "Frontend Build"
+    dependencies: []
     task:
       env_vars:
         - name: NODE_VERSION
           value: "18"
+        - name: WS_URL
+          value: "http://localhost"
       prologue:
         commands:
           - checkout
@@ -32,6 +31,7 @@ blocks:
             - echo "Frontend build completed successfully"
 
   - name: "Java Backend Build"
+    dependencies: []
     task:
       env_vars:
         - name: JAVA_VERSION
@@ -49,22 +49,28 @@ blocks:
             - echo "Java backend build completed successfully"
 
   - name: "Infrastructure Validation"
+    dependencies: []
     task:
       env_vars:
         - name: TERRAFORM_VERSION
-          value: "1.5.7"
+          value: "1.12.2"
       prologue:
         commands:
+          - 'terraformUrl="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"'
+          - 'curl -LO ${terraformUrl}'
+          - 'unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip'
+          - ROOT_DIR=`pwd`
+
           - checkout
-          - sem-version terraform $TERRAFORM_VERSION
           - cd infrastructure
       jobs:
         - name: "Validate Terraform Configuration"
           commands:
-            - echo "Initializing Terraform..."
-            - terraform init -backend=false
+            - echo "terraform is installed at ${ROOT_DIR}"
+            - ${ROOT_DIR}/terraform version
+            - ${ROOT_DIR}/terraform init -backend=false
             - echo "Validating Terraform configuration..."
-            - terraform validate
+            - ${ROOT_DIR}/terraform validate
             - echo "Checking Terraform formatting..."
-            - terraform fmt -check -recursive
+            - ${ROOT_DIR}/terraform fmt -check -recursive
             - echo "Infrastructure validation completed successfully"
