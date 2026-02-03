@@ -19,7 +19,7 @@ blocks:
       prologue:
         commands:
           - checkout
-          - nvm use $NODE_VERSION
+          - sem-version node $NODE_VERSION
           - cd frontend
       jobs:
         - name: "Build Frontend Application"
