@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>5.12.0</version>
+            <version>5.13.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.confluent/kafka-json-schema-serializer -->
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.6.2</version>
+            <version>1.6.4</version>
         </dependency>
 
         <dependency>
